@@ -160,3 +160,6 @@ https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
 
 https://kubernetes.io/docs/reference/kubectl/conventions/
 
+## 3. Around Logging and Monitoring
+
+- Just understand how to use the `kubectl logs` and `kubectl top`(depends on metrics-server) commands. Don't worry about complex monitoring solutions for the exam.
