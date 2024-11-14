@@ -163,3 +163,7 @@ https://kubernetes.io/docs/reference/kubectl/conventions/
 ## 3. Around Logging and Monitoring
 
 - Just understand how to use the `kubectl logs` and `kubectl top`(depends on metrics-server) commands. Don't worry about complex monitoring solutions for the exam.
+
+## 4. When in doubt, double check
+
+- This applys to everything in the exam. You must verify your work by yourself. For example, if the question is to create a pod with a specific image, you must run the kubectl describe pod command to verify the pod is created with the correct name and correct image.
