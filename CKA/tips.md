@@ -167,3 +167,79 @@ https://kubernetes.io/docs/reference/kubectl/conventions/
 ## 4. When in doubt, double check
 
 - This applys to everything in the exam. You must verify your work by yourself. For example, if the question is to create a pod with a specific image, you must run the kubectl describe pod command to verify the pod is created with the correct name and correct image.
+
+## 5. Make sure that you really understand TLS
+
+- Understand how to generate certificates, how to use them in Kubernetes, how to secure the communication between the components, etc. Certificate Health Check Spreadsheet provided by kodekloud: https://github.com/mmumshad/kubernetes-the-hard-way/blob/master/tools/kubernetes-certs-checker.xlsx
+
+To check certificate information:
+```bash
+openssl x509 -in file.crt -text -noout
+```
+
+In case of problems, always check the logs of the component that is having the problem. Since the components are responsible for the health of the cluster, you will not be able to see the logs with kubectl logs, you will need to check the logs in the node where the component is running (generally in the controlplane).
+
+Check for containers in execution (if the component is running as a static pod):
+```bash
+crictl ps -a
+```
+
+Check for logs of a container:
+```bash
+crictl logs [container-id]
+```
+
+If the components are running as a Linux service in the node (generally provisioned without kubeadm), you can check the logs with journalctl:
+```bash
+journalctl -u [service-name]
+```
+
+### TLS Examples
+
+Every client/server in Kubernetes has a certificate, depending of the communication between the components. The kube-apiserver has a certificate, the kubelet has a certificate, the kube-scheduler has a certificate, etc.
+
+#### Certificate Authority (used to sign other certificates)
+
+1. CA key
+
+```bash
+openssl genrsa -out ca.key 2048
+```
+
+2. CA csr
+
+```bash
+openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+```
+
+3. CA crt
+
+```bash
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+```
+
+#### Admin User Certificate
+
+1. Admin key
+
+```bash
+openssl genrsa -out admin.key 2048
+```
+
+2. Admin csr
+
+```bash
+openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+```
+
+3. Admin crt
+
+```bash
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+```
+
+Using the certificates to authenticate with the kube-apiserver:
+
+```bash
+curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
+```

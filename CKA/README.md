@@ -19,3 +19,9 @@ Also finished the Application Lifecycle Management section, no surprises around 
 Finished the Cluster Maintenance section. This section is very important to understand how to maintain a Kubernetes cluster, how to upgrade it, how to backup and restore, how to troubleshoot it, etc. Everything that a Cloud Provider does for you.
 
 - 49% completed, 51% to go.
+
+## Day 4 (14 Nov 2024)
+
+Security section, deep dive in TLS.
+
+- 54% completed, 46% to go.
