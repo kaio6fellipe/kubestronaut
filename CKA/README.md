@@ -25,3 +25,9 @@ Finished the Cluster Maintenance section. This section is very important to unde
 Security section, deep dive in TLS.
 
 - 54% completed, 46% to go.
+
+## Day 5 (15 Nov 2024)
+
+Finished Security section, Authentication, Authorization, Network Policies, Service Accounts, Security Contexts, etc.
+
+- 65% completed, 35% to go.
