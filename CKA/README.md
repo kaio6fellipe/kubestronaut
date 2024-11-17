@@ -31,3 +31,9 @@ Security section, deep dive in TLS.
 Finished Security section, Authentication, Authorization, Network Policies, Service Accounts, Security Contexts, etc.
 
 - 65% completed, 35% to go.
+
+## Day 6 (16 Nov 2024)
+
+Finished Storage section, Volumes, Persistent Volumes, Storage Classes, StatefulSets, etc. Started and finished Networking section, Services, Ingress, Network Policies, etc.
+
+- 85% completed, 15% to go.

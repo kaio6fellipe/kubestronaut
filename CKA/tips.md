@@ -243,3 +243,7 @@ Using the certificates to authenticate with the kube-apiserver:
 ```bash
 curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
 ```
+
+## 6. Make sure that you really understand Networking on Kubernetes
+
+- Understand networking concepts, how it works on Linux Systems, how it works on namespaced environments and how it works on Kubernetes.
