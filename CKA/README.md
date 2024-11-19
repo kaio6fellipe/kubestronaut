@@ -37,3 +37,9 @@ Finished Security section, Authentication, Authorization, Network Policies, Serv
 Finished Storage section, Volumes, Persistent Volumes, Storage Classes, StatefulSets, etc. Started and finished Networking section, Services, Ingress, Network Policies, etc.
 
 - 85% completed, 15% to go.
+
+## Day 7 (18 Nov 2024)
+
+Design and Installation of a Kubernetes Cluster section. ETCD in HA. High Availability for K8S control plane.
+
+- 88% completed, 12% to go.
