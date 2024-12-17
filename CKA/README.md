@@ -43,3 +43,9 @@ Finished Storage section, Volumes, Persistent Volumes, Storage Classes, Stateful
 Design and Installation of a Kubernetes Cluster section. ETCD in HA. High Availability for K8S control plane.
 
 - 88% completed, 12% to go.
+
+## Day 8 (16 Dez 2024)
+
+Kubernetes installation with kubeadm and troubleshooting for apps, control plane and worker nodes.
+
+- 93% completed, 7% to go.
