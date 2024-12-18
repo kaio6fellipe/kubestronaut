@@ -49,3 +49,10 @@ Design and Installation of a Kubernetes Cluster section. ETCD in HA. High Availa
 Kubernetes installation with kubeadm and troubleshooting for apps, control plane and worker nodes.
 
 - 93% completed, 7% to go.
+
+## Day 9 (17 Dez 2024)
+
+Finished the course, now it's time to practice with the mock exams.
+
+- Lightning Lab 1: 35% (1h)
+  - Need to review: jsonpath and cluster upgrade (got stuck with kubeadm upgrade problem at one node)
