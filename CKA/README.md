@@ -56,3 +56,7 @@ Finished the course, now it's time to practice with the mock exams.
 
 - Lightning Lab 1: 35% (1h)
   - Need to review: jsonpath and cluster upgrade (got stuck with kubeadm upgrade problem at one node)
+
+## Day 10 (18 Dez 2024)
+
+- Content review and re-do the Lightning Lab 1: 100% (1h)
