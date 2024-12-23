@@ -60,3 +60,8 @@ Finished the course, now it's time to practice with the mock exams.
 ## Day 10 (18 Dez 2024)
 
 - Content review and re-do the Lightning Lab 1: 100% (1h)
+
+## Day 11 (22 Dez 2024)
+
+- Mock Exam 1: 92% (1h)
+  - Pay attention to the task definition, read it carefully, missed a question because it asked to create a static pod on the **controlplane** node (`/etc/kubernetes/manifests/` folder) and I created with the Kubernetes API.

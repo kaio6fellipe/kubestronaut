@@ -3,7 +3,15 @@
 
 > [Handbook](https://docs.linuxfoundation.org/tc-docs/certification/lf-handbook2) and [Important instructions](https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad)
 
-## 1. Use the `kubectl run` command to generate YAML files
+## General Tips
+
+- Get confortable with `kubectl`, use aliases if needed (but don't be obsessed about it, personally I used only `k` for `kubectl`).
+- You're not alone in the exam, you can use the browser within the VM to access the Kubernetes documentation: https://kubernetes.io/docs/ or https://kubernetes.io/blog.
+- Review your work, always double check your answers.
+- Make sure to copy and paste the names correctly from the question, it's easy to make mistakes.
+- Manage your time effectively, don't spend too much time on a single question, you don't have to get everything right to pass the exam.
+
+## 1. Use the `kubectl run/create` commands to generate YAML files
 
 Creating and editing YAML files is a bit difficult, especially in the CLI. During the exam, you might find it difficult to copy and paste YAML files from the browser to the terminal. Using the `kubectl run` command can help in generating a YAML template. And sometimes, you can even get away with just the `kubectl run` command without having to create a YAML file at all. For example, if you were asked to create a pod or deployment with a specific name and image, you can simply run the `kubectl run` command.
 
