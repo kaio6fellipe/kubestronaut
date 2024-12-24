@@ -257,3 +257,29 @@ curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --
 ## 6. Make sure that you really understand Networking on Kubernetes
 
 - Understand networking concepts, how it works on Linux Systems, how it works on namespaced environments and how it works on Kubernetes.
+
+## 7. Questions that you should be able to answer (the possibility of appearing in the exam is high, I think)
+
+> Thanks to [kubernetesWay](https://www.youtube.com/@kubernetesway) youtube channel.
+
+- Cluster Upgrade to a specific version
+- ETCD Backup and Restore
+- Join a Node to the Cluster
+- Cluster Troubleshoot
+- Reschedule pods to another Nodes
+  - This could be with kubeclt drain or with taints and tolerations
+- PV and PVC
+- Pod Expose through NodePort
+- Daemonset
+- Network policy
+- Roles and Role Binding
+- List all PV Sorted by capacity
+- Pod logs write to file
+- Create a pod with specific label
+- Create a pod with runAsUser
+- Create a multi container pod
+- Create a pod with resource request
+- Find pods running high CPU workloads
+- Write the count of nodes which are in ready state
+- Schedule a pod using pod selector
+- Scale the deployment

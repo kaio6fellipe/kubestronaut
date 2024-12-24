@@ -65,3 +65,10 @@ Finished the course, now it's time to practice with the mock exams.
 
 - Mock Exam 1: 92% (1h)
   - Pay attention to the task definition, read it carefully, missed a question because it asked to create a static pod on the **controlplane** node (`/etc/kubernetes/manifests/` folder) and I created with the Kubernetes API.
+
+## Day 12 (23 Dez 2024)
+
+- Mock Exam 2: 70% (1h)
+  - Need to review CSR process and cluster DNS for pods.
+- Mock Exam 3: 74% (1h)
+  - Need to review advanced jsonpath filtering and network policies (mismached the `from` field and included an unused `podSelector` field).
