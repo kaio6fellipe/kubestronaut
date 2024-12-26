@@ -72,3 +72,8 @@ Finished the course, now it's time to practice with the mock exams.
   - Need to review CSR process and cluster DNS for pods.
 - Mock Exam 3: 74% (1h)
   - Need to review advanced jsonpath filtering and network policies (mismached the `from` field and included an unused `podSelector` field).
+
+## Day 13 (26 Dez 2024)
+
+- Mock Exam 4: 79% (2h)
+  - It was ok, I skipped some low score questions.
