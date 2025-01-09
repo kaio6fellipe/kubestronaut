@@ -69,9 +69,9 @@ Finished the course, now it's time to practice with the mock exams.
 ## Day 12 (23 Dez 2024)
 
 - Mock Exam 2: 70% (1h)
-  - [ ] Need to review CSR process and cluster DNS for pods.
+  - [x] Need to review CSR process and cluster DNS for pods.
 - Mock Exam 3: 74% (1h)
-  - [ ] Need to review advanced jsonpath filtering and network policies (mismached the `from` field and included an unused `podSelector` field).
+  - [x] Need to review advanced jsonpath filtering and network policies (mismached the `from` field and included an unused `podSelector` field).
 
 ## Day 13 (26 Dez 2024)
 
@@ -81,4 +81,9 @@ Finished the course, now it's time to practice with the mock exams.
 ## Day 14 (27 Dez 2024)
 
 - Mock Exam 5: 84% (2h)
-  - [ ] Need to review the topics around cluster troubleshooting and the usage of containerd with `nerdctl` and the usage of `journalctl` to troubleshoot the kubelet.
+  - [x] Need to review the topics around cluster troubleshooting and the usage of containerd with `nerdctl` and the usage of `journalctl` to troubleshoot the kubelet.
+
+## Day 15 (08 Jan 2025)
+
+- Mock Exam 6: 88% (2h)
+  - [x] Nothing to review, just need to pay attention to task description  and make sure it is being followed correctly.
