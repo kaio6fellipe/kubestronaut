@@ -86,4 +86,9 @@ Finished the course, now it's time to practice with the mock exams.
 ## Day 15 (08 Jan 2025)
 
 - Mock Exam 6: 88% (2h)
-  - [x] Nothing to review, just need to pay attention to task description  and make sure it is being followed correctly.
+  - [x] Nothing to review, just need to pay attention to task description and make sure it is being followed correctly.
+
+## Day 16 (16 Jan 2025)
+
+- Mock Exam 7: 84% (2h)
+  - [x] Nothing to review, just need to pay attention to task description again 😅
