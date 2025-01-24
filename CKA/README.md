@@ -92,3 +92,11 @@ Finished the course, now it's time to practice with the mock exams.
 
 - Mock Exam 7: 84% (2h)
   - [x] Nothing to review, just need to pay attention to task description again 😅
+
+## Day 17 (23 Jan 2025)
+
+- Mock Exam 8 (Killer Shell CKA Simulator): 75% (2h)
+  - [ ] I have to use the `$do` (`--dry-run=client -o yaml`) flag and `$now` (`--force --grace-period=0`) flag more often.
+  - [ ] Review of `kubectl run manual-schedule`
+  - [ ] Difference between pod affinity and pod anti affinity with topologyKey and the use of topologySpreadConstraints
+- Exam scheduled for 25 Jan 2025, 07:00 PM
