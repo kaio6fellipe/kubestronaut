@@ -174,20 +174,7 @@ https://kubernetes.io/docs/reference/kubectl/conventions/
 
 - Just understand how to use the `kubectl logs` and `kubectl top`(depends on metrics-server) commands. Don't worry about complex monitoring solutions for the exam.
 
-## 4. When in doubt, double check
-
-- This applys to everything in the exam. You must verify your work by yourself. For example, if the question is to create a pod with a specific image, you must run the kubectl describe pod command to verify the pod is created with the correct name and correct image.
-
-## 5. Make sure that you really understand TLS
-
-- Understand how to generate certificates, how to use them in Kubernetes, how to secure the communication between the components, etc. Certificate Health Check Spreadsheet provided by kodekloud: https://github.com/mmumshad/kubernetes-the-hard-way/blob/master/tools/kubernetes-certs-checker.xlsx
-
-To check certificate information:
-```bash
-openssl x509 -in file.crt -text -noout
-```
-
-In case of problems, always check the logs of the component that is having the problem. Since the components are responsible for the health of the cluster, you will not be able to see the logs with kubectl logs, you will need to check the logs in the node where the component is running (generally in the controlplane).
+In case of problems for kubernetes components, always check the logs of the component that is having the problem. Since the components are responsible for the health of the cluster, you will not be able to see the logs with kubectl logs, you will need to check the logs in the node where the component is running (generally in the controlplane).
 
 Check for containers in execution (if the component is running as a static pod):
 ```bash
@@ -202,6 +189,19 @@ crictl logs [container-id]
 If the components are running as a Linux service in the node (generally provisioned without kubeadm), you can check the logs with journalctl:
 ```bash
 journalctl -u [service-name]
+```
+
+## 4. When in doubt, double check
+
+- This applys to everything in the exam. You must verify your work by yourself. For example, if the question is to create a pod with a specific image, you must run the kubectl describe pod command to verify the pod is created with the correct name and correct image.
+
+## 5. Make sure that you really understand TLS
+
+- Understand how to generate certificates, how to use them in Kubernetes, how to secure the communication between the components, etc. Certificate Health Check Spreadsheet provided by kodekloud: https://github.com/mmumshad/kubernetes-the-hard-way/blob/master/tools/kubernetes-certs-checker.xlsx
+
+To check certificate information:
+```bash
+openssl x509 -in file.crt -text -noout
 ```
 
 ### TLS Examples
