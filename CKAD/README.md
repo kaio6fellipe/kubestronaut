@@ -12,3 +12,7 @@ Reviewed POD design section, Services & Networking and State Persistence. Everyt
 
 - 100% completed.
 - Mock Exam 1: 100% (1h)
+
+# Day 3 (17 Mar 2025)
+
+Reviewed the 2025 updated content, mostly around kustomize.
