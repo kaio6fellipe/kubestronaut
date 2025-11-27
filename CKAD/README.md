@@ -16,3 +16,9 @@ Reviewed POD design section, Services & Networking and State Persistence. Everyt
 # Day 3 (17 Mar 2025)
 
 Reviewed the 2025 updated content, mostly around kustomize.
+
+# Day 4 (27 Nov 2025)
+
+After a long break, I started the CKAD mock exams again. I've lost the habit and I'm letting some details slip by; I need to pay more attention to the NOTE sections and the requested specifications, nothing more than that (if they tell you to create a deployment with a single specific label, don't put any others).
+
+- Mock Exam 2: 84% (2h)
