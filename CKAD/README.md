@@ -22,3 +22,13 @@ Reviewed the 2025 updated content, mostly around kustomize.
 After a long break, I started the CKAD mock exams again. I've lost the habit and I'm letting some details slip by; I need to pay more attention to the NOTE sections and the requested specifications, nothing more than that (if they tell you to create a deployment with a single specific label, don't put any others).
 
 - Mock Exam 2: 84% (2h)
+
+# Day 5 (29 Nov 2025)
+
+Still need to pay more attention to what is being asked, missing some details around resource names.
+
+Reviewed NodePort services (depending to what is being asked, the service port might be different from the node port, the target port is the port of the pod)
+
+CRD are just a way for you to waste time, if you are asked to create a complex CRD, just skip it and try it again in the end.
+
+- Mock Exam 3: 84% (1h30min)
