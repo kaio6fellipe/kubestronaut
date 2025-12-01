@@ -32,3 +32,10 @@ Reviewed NodePort services (depending to what is being asked, the service port m
 CRD are just a way for you to waste time, if you are asked to create a complex CRD, just skip it and try it again in the end.
 
 - Mock Exam 3: 84% (1h30min)
+
+# Day 6 (30 Nov 2025)
+
+Not much to review, just need to take care of some descriptions that are not clear and not specific like this one: `The pod should not be restarted in any case if it has already exited.`. It was referencing a restartPolicy of `Never`. Also, CRDs need an extra attention, remember how to enable the status subresource, pay attention to the template provided by the exame (always copy to another file to avoid losing it).
+
+- Mock Exam 4: 90% (1h30min)
+- Mock Exam 5: 92% (1h30min)
