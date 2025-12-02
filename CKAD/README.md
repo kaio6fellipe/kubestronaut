@@ -39,3 +39,9 @@ Not much to review, just need to take care of some descriptions that are not cle
 
 - Mock Exam 4: 90% (1h30min)
 - Mock Exam 5: 92% (1h30min)
+
+# Day 7 (01 Dec 2025)
+
+Need to review helm commands to be able to locate myself with repository, charts and values files without accessing the browser.
+
+- Mock Exam 6: 100% (1h)
