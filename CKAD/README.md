@@ -45,3 +45,7 @@ Not much to review, just need to take care of some descriptions that are not cle
 Need to review helm commands to be able to locate myself with repository, charts and values files without accessing the browser.
 
 - Mock Exam 6: 100% (1h)
+
+# Day 8 (02 Dec 2025)
+
+- Mock Exam 7: 100% (1h10min)
