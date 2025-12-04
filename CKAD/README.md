@@ -49,3 +49,7 @@ Need to review helm commands to be able to locate myself with repository, charts
 # Day 8 (02 Dec 2025)
 
 - Mock Exam 7: 100% (1h10min)
+
+# Day 9 (03 Dec 2025)
+
+- Mock Exam 8: 100% (1h30min)
