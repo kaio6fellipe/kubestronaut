@@ -53,3 +53,9 @@ Need to review helm commands to be able to locate myself with repository, charts
 # Day 9 (03 Dec 2025)
 
 - Mock Exam 8: 100% (1h30min)
+
+# Day 10 (04 Dec 2025)
+
+Last day of Kodekloud CKAD mock exams. Tomorrow I will have more mock exams of Linux Foundation. Last day to check if I need to review something.
+
+- Mock Exam 9: 100% (1h30min)
