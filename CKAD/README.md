@@ -59,3 +59,7 @@ Need to review helm commands to be able to locate myself with repository, charts
 Last day of Kodekloud CKAD mock exams. Tomorrow I will have more mock exams of Linux Foundation. Last day to check if I need to review something.
 
 - Mock Exam 9: 100% (1h30min)
+
+# Day 11 (05 Dec 2025)
+
+- Killer Shell mock exam: 91% (2h)
