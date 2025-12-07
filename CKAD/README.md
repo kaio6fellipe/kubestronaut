@@ -63,3 +63,7 @@ Last day of Kodekloud CKAD mock exams. Tomorrow I will have more mock exams of L
 # Day 11 (05 Dec 2025)
 
 - Killer Shell mock exam: 91% (2h)
+
+# Day 12 (06 Dec 2025)
+
+Exam day. It was ok, just waiting for the results (the tests were way easier compared to the Killer Shell mock exams).
