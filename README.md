@@ -3,7 +3,7 @@
 Kubestronaut notes and journey
 
 * [x] CKA
-* [ ] CKAD
+* [x] CKAD
 * [ ] KCNA
 * [ ] KCSA
 * [ ] CKS
