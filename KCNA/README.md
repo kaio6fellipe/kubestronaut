@@ -33,3 +33,9 @@ As I started with CKA and CKAD, KCNA content will be almost 100% similar, so I w
 - KCNA course 100% completed
 
 Tomorrow is the exam day.
+
+## Day 4 (20 Dec 2025)
+
+Exam day. I should not have spent so much time doing so many quizzes and mock exams, I have never done an associate level exame before, I thought it would be harder.
+
+Let's go to the KCSA.
