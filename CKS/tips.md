@@ -54,11 +54,39 @@ Additionally, almost the same tips from CKA and CKAD too:
 - `securityContext.runAsUser` and `securityContext.runAsGroup` should be set to a non-root user and group.
 - Avoid capabilities like `CAP_SYS_BOOT`.
 - Avoid `hostPath` mounts.
-- Use Pod Security Admission (PSA) or Pod Security Standards (PSS). The Pod Security Policy (PSP) was removed at version `1.25`. PSA should be enabled on the API server under the flag `--enable-admission-plugins=PodSecurityPolicy`.
+- Use Pod Security Admission (PSA) or Pod Security Standards (PSS). The Pod Security Policy (PSP) was removed at version `1.25`. PSA should be enabled on the API server under the flag `--enable-admission-plugins=PodSecurity`.
   - How it works: 
     ```
-    kubectl -> authentication -> authorization -> admission controlers (PodSecurityPolicy) -> create a pod
+    kubectl -> authentication -> authorization -> admission controlers (PodSecurity) -> create a pod
     ```
+
+### Pod Security Admission (PSA)
+
+How to check if PSA is enabled on the api-server (if running as a static pod):
+
+```bash
+kubectl exec -n kube-system kube-apiserver-<node-name> -- kube-apiserver -h | grep enable-admission
+```
+
+Configured on the namespace level, with labels:
+
+```bash
+kubectl label ns payroll pod-security.kubernetes.io/<mode>=<security-standard>
+```
+
+Available modes:
+
+- `enforce`: reject pod
+- `audit`: record in the audit logs
+- `warn`: trigger user-facing warning
+
+Built-in profiles (security standard):
+
+- `privileged`: unrestricted policy
+- `baseline`: minimally restrictive policy
+- `restricted`: heavily restricted policy
+
+> For more details: [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) and [Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)
 
 ## Securing etcd
 
@@ -129,3 +157,289 @@ Additionally, almost the same tips from CKA and CKAD too:
     - Which user account will be used to access the cluster
 - The config `current-context` is the context that will be used to access the cluster.
   - To change the context, use the command `kubectl config use-context <context-name>`.
+
+## Authentication on kube-apiserver
+
+You can not create users with kubectl, you will rely on the following mechanisms (basic auth is not recommended for production environments):
+
+- static password file (basic): set the `--basic-auth-file` flag to the kube-apiserver with a .csv, for example: `password123,user1,u0001,group1`. To authenticate, use it like this: `curl -u user1:password123 https://kube-apiserver:6443/api/v1/pods`.
+- static token file (basic): set the `--token-auth-file` flag to the kube-apiserver with a .csv, for example: `token123,user1,u0001,group1`. To authenticate, use it like this: `curl -H "Authorization: Bearer token123" https://kube-apiserver:6443/api/v1/pods`.
+- certificates
+- identity services
+
+## Authorization on a cluster
+
+Authorization is the process of determining if a user has access to a resource.
+
+Authorization mechanisms:
+
+- `Node`: used to authorize requests from nodes to the API server, managed by node authorizer.
+- `ABAC`: attribute-based access control, used to authorize requests based on the attributes of the user and the resource. It's controlled by an policy file and we should restart the API server to apply the changes.
+- `RBAC`: role-based access control, used to authorize requests based on the roles of the user and the resource. Easier than ABAC 'cause we just need to update the roles and role bindings.
+- `Webhook`: used to authorize requests based on the webhook, if we want to manage authorization externally, without built-in mechanisms, like using Open Policy Agent (OPA).
+
+Authorization modes for kube-apiserver:
+
+- `AlwaysAllow` (default)
+- `AlwaysDeny`
+- `Node`
+- `ABAC`
+- `RBAC`
+- `Webhook`
+
+We can set multiple authorization modes, for example: `--authorization-mode=Node,RBAC,Webhook`. The order is important, the first mode that matches the request will be used.
+
+### RBAC
+
+Consists of the following components:
+
+- Roles (namespace-scoped)
+- Role Bindings (namespace-scoped)
+- Cluster Roles (cluster-scoped)
+- Cluster Role Bindings (cluster-scoped)
+
+Roles define the permissions for a resource, for example: `get`, `list`, `watch`, `create`, `update`, `delete`.
+
+Role Bindings bind a role to a user or a group, for example: `user1:role1`, `group1:role2`.
+
+Cluster Roles define the permissions for a resource in the cluster, for example: `get`, `list`, `watch`, `create`, `update`, `delete`.
+
+Cluster Role Bindings bind a cluster role to a user or a group, for example: `user1:clusterrole1`, `group1:clusterrole2`.
+
+How to check access to a resource (if you are an administrator you can impersonate any user):
+
+- Check if the current user can perform an action
+
+    ```bash
+    kubectl auth can-i <action> <resource>
+    ```
+
+- Check if a specific user or service account can perform an action (impersonation):
+
+    ```bash
+    kubectl auth can-i <action> <resource> --as <user>
+    ```
+
+## Audit logging
+
+We can use policy object to define audit configs:
+
+```yaml
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages: ["RequestReceived"] # RequestReceived, ResponseStarted, ResponseComplete, Panic
+rules:
+- namespaces: ["prod-namespace"]
+  verbs: ["delete"]
+  resources:
+  - group: " "
+    resources: ["pods"]
+    resourceNames: ["webapp-pod"]
+  level: RequestResponse # None, Metadata, Request, RequestResponse
+- level: Metadata
+  resources:
+  - group: " "
+    resources: ["secrets"]
+```
+
+> For more details: [Audit Policy](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/#audit-policy)
+
+The local where audit logs are stored is set on the kube-apiserver flag `--audit-log-path` and to set the policy file we use the flag `--audit-policy-file`.
+
+Remember to map the volumes on the kube-apiserver pod for the audit logs and audit policy file.
+
+```yaml
+...
+    volumeMounts:
+    - mountPath: /etc/kubernetes/audit-policy.yaml
+        name: audit
+        readOnly: true
+    - mountPath: /var/log/kubernetes/audit/
+        name: audit-log
+        readOnly: false
+
+...
+volumes:
+- name: audit
+  hostPath:
+    path: /etc/kubernetes/audit-policy.yaml
+    type: File
+
+- name: audit-log
+  hostPath:
+    path: /var/log/kubernetes/audit/
+    type: DirectoryOrCreate
+```
+
+## Threat Model
+
+### Trust Boundaries
+
+Trust boundaries are a way to isolate environments from each other. A breach in one part doesn't compromise the whole application. Using separeted clusters for each environment is a good practice (development, staging, production).
+
+Trust boundaries splitting the cluster into multiple node groups (one for frontend, one for backend, another one for databases, etc...). This is a good practice to isolate layers of the same application, in this way, if an attacker compromises the frontend layer, they won't be able to jump to the backend layer, if we have a proper setup of nodes and namespaces isolation.
+
+Threat actors:
+
+- External Attackers
+- Compromised Containers
+- Malicious Users
+
+### Attacker Persistence
+
+Hability to an attacker to maintain access to the cluster after the initial access.
+
+> For more details:[AttackTrees/EstablishPersistence.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/EstablishPersistence.md)
+
+Mitigating Persistence Risks:
+
+- RBAC
+- Restrict Access to Secrets
+- Hardening pod security policies
+- Regular updates and patching
+- Monitoring and auditing
+
+### Denial of Service
+
+When attackers overload the systems resources, affecting primarily the availability of the system.
+
+> For more details: [AttackTrees/DenialOfService.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/DenialOfService.md)
+
+Mitigating DoS Risks:
+
+- Resource quotas and limits
+- Secure SAs, least privilege of service accounts, only set the needed permissions for the workload
+- Implement NetworkPolicy
+- Monitoring cluster resources and setup alerts
+
+### Malicious Code Execution
+
+If an attackers find a vulnerability in an application, they can execute malicious code to gain access to the environment.
+
+> For more details: [AttackTrees/MaliciousCodeExecution.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/MaliciousCodeExecution.md)
+
+Mitigating Malicious Code Execution Risks:
+
+- Scanning vulnerabilities on the application and applying patches, updating servers and backend with security patches to reduce exploitation risk
+- Restrict access to the API server with RBAC
+- Protect image pull secrets and limit access to necessary pods
+- Signed images verify the integrity and authenticity
+- Setup alerts for suspicious activity
+- Auditing and Reviewing, check permissions granted to service accounts, security of the image repository, access controls for API server
+
+### Compromised Application in Containers
+
+When the attacker compromise an application in a container, this can led to a breach of the entire cluster.
+
+> For more details: [AttackTrees/CompromisedContainer.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/CompromisedContainer.md)
+
+### Attacker on the Network
+
+When the attacker target Kubernetes control plane and nodes for breaches.
+
+> For more details: [AttackTrees/AttackerOnTheNetwork.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/AttackerOnTheNetwork.md)
+
+Mitigating Network Risks:
+
+- Configure firewalls to limit network access to trusted IP addresses
+- Keep node operating systems and components updated and patched
+- Implement network policies to control traffic and prevent lateral movement
+- Use strong authentication, multi-factor, and RBAC for secure access
+- Monitor and log activities to detect and respond to threats
+
+### Access to Sensitive Data
+
+When the attacker gain access to sensitive data.
+
+> For more details: [AttackTrees/AccessSensitiveData.md](https://github.com/cncf/financial-user-group/blob/main/projects/k8s-threat-model/AttackTrees/AccessSensitiveData.md)
+
+Mitigating Data Risks:
+
+- Ensure RBAC permissions are correctly configured to avoid excessive access
+- Secure logs to prevent storing and exposing sensitive information
+- Encrypt network traffic using TLS to prevent eavesdropping attacks
+
+## Compliance and Security Frameworks
+
+Guidelines and standards to ensure system integrity and meet legal obligations.
+
+- GDPR (General Data Protection Regulation)
+  - Secure user data
+  - Encrypt user data at rest stored
+  - Ensure only authorized backend services can access
+- HIPAA (Health Insurance Portability and Accountability Act)
+  - Encrypting PHI stored in and transmitted through Kubernetes
+  - Ensuring RBAC is in place for accessing sensitive data
+  - Securely configuring Kubernetes secrets for application use
+- PCI DSS
+  - Restricting access to sensitive namespaces and resources
+  - Network segmentation using Kubernetes Network Policies
+  - Logging and monitoring for all access to cardholder data
+- NIST
+  - Conducting regular risk assessments to identity potential vulnerabilities
+  - Implementing security controls like firewalls, intrustion detection systems
+  - Regular security audits helps mitigate these risks
+- CIS Benchmarks (Center for Internet Security), `kube-bench` is a tool to use and check if the cluster is compliant with the benchmarks.
+  - Hardening Kubernetes components and configurations
+  - Authentcation and Authorization best practices
+  - Logging and Monitoring
+  - Network policies
+  - Pod security
+
+### Threat Modelling Frameworks
+
+Define how to do be compliant with security best practices.
+
+- Mitre ATT&CK
+  - What attackers aim to do (Tactics)
+  - How they do it (Techniques)
+- STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
+
+### Supply Chain Compliance
+
+Ensure the security and compliance of external components.
+
+- Artifacts (Binaries, Container Images)
+  - Tools like: sigstore cosign
+- Metadata
+  - Components, Libraries, Dependencies
+  - Tools like: syft
+- Attestations
+- Policies
+  - sigstore policy-controller
+
+How everything work together:
+
+- Binaries and container images are signed using Cosign
+- The SBOM details all the components and their origins, helping you identity risks
+- The SBOM and othe rmetadata are signed to ensure trustworthiness
+- Finally Admission controllers verify these signatures and enforce compliance before deployment
+
+### Automation and Tooling
+
+> For more details: [Security Whitepaper](https://github.com/cncf/tag-security/blob/main/community/resources/security-whitepaper/CNCF_Security_Whitepaper.pdf)
+
+Cloud Native Security Map discuss the security of phases of the software development lifecycle, shift left security to catch vulnerabilities early and reduce the cost.
+
+- Develop
+  - Code, Dockerfile, Kubernetes Manifests, IaC
+  - Tools like: oss-fuzz, snyk code, fabric8, kube-linter, checkov
+- Distribute
+  - Build Pipelines: Tekton, Jenkins, Travis CI, ArgoCD (with argo workflows)
+  - Container Registry: Distribution, Dockerhub, Harbor, Github Registry, Nexus Repository,
+  - Before images are built, tools like help on container manifest and IaC vulnerability check: kubesec, terrascan
+  - Security Tests: Nuclei, trivy, snyk, clair, grype
+  - Signing/Trust tools: in-toto, notation, TUF, sigstore
+- Deploy
+  - Pre-flight checks: gatekeeper, kyverno
+  - Observability: Prometheus, Grafana, Elastic, OpenTelemetry
+  - Response & Investigation: Wazuh, Snort (IDPS), Zeek 
+- Runtime
+  - Orchestration: kube-bench, trivy, falco, spiffe
+  - Service Mesh: Istio, Linkerd, Cilium
+  - Storage: ROOK, ceph, gluster
+  - Access: keycloak, teleport, hashicorp vault
+
+## Platform Security
+
+...

@@ -10,6 +10,12 @@ KCSA course started at Kodekloud. Security is a special topic for me, I always h
 
 ## Day 2 (22 Dec 2025)
 
-Securing Kubelet, container urntime, kube-proxy, etc, container networking and client security around kubectl proxy and kubeconfig.
+Securing Kubelet, container runtime, kube-proxy, etc, container networking and client security around kubectl proxy and kubeconfig.
 
 - 30% completed, 70% to go.
+
+## Day 3 (23 Dec 2025)
+
+Kubernetes Security Fundamentals, Threat Model, Compliance and Security Frameworks.
+
+- 72% completed, 28% to go.
