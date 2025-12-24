@@ -442,4 +442,85 @@ Cloud Native Security Map discuss the security of phases of the software develop
 
 ## Platform Security
 
-...
+### Minimize base image blueprint
+
+A base image is usually built `FROM scratch`, then, other apps usuarlly use those base images and include layers on top of it, like httpd, nginx.
+
+1. Create slim/minimal images
+2. Find an official minimal image that exists
+3. Only install necessary packages
+   - Remove Shells/Package Managers/Tools
+4. Maintain different images for different environments
+   - Development - debug tools
+   - Production - lean
+5. Use multi-stage builds to create lean production ready images
+
+Google distroless docker images contains application, runtime dependencies and does not contain package managers, shells, network tools, text editors and other unwanted programs.
+
+> For more details: [Distroless Docker Images](https://github.com/GoogleContainerTools/distroless)
+
+### Scan images for known vulnerabilities
+
+Example of vulnerability scanning:
+
+```bash
+trivy image httpd:alpine
+```
+
+### Observability
+
+Beside the effort to secure a cloud native ecosystem, there is no way to guarantee 100% of the security of the system. We should always be prepared to scenario where something goes wrong and systems are compromised.
+
+As soon as we find that something is wrong with our systems, we can respond to it.
+
+Observability tools for abnormal behavior are crucial to detect and respond to threats. One example is the `falco` tool.
+
+### Using falco to detect threats
+
+The easiest way to use falco is to install it as a daemonset on the cluster. But it can be installed as a package on each node.
+
+Falco implement several rules to detect abnormal behavior, rules are written in a `rules.yaml` file with the following structure:
+
+```yaml
+- rule: <Name of the Rule>
+  desc: <Detailed Description of the Rule>
+  condition: <When to filter events metching the rule>
+  output: <Output to be generated for the Event>
+  priority: <Severity of the event>
+
+- rule: Detect Shell inside a container
+  desc: Alert if a shell such as bash is open inside the container
+  condition: container and proc.name in (linux_shells)
+  output: Bash Shell Opened (user=%user.name container=%container.id)
+  priority: WARNING
+
+- list: linux_shells
+  items: ["bash", "sh", "zsh", "fish", "tcsh", "csh"]
+
+- macro: container
+  condition: container.id != host
+```
+
+> For more details about [supported fields](https://falco.org/docs/reference/rules/supported-fields/)
+
+### Service Mesh
+
+Istiod merged components (control plane):
+
+- Citadel: Certificate generation
+- Galley: Configuration
+- Pilot: Service discovery
+- Mixer: Extensibility
+
+To include a mesh-wide policy, we just need to create the resource on the istio-system namespace.
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: demo-peer-policy
+  namespace: istio-system
+spec:
+  mtls:
+    mode: STRICT
+```

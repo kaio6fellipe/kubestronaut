@@ -19,3 +19,9 @@ Securing Kubelet, container runtime, kube-proxy, etc, container networking and c
 Kubernetes Security Fundamentals, Threat Model, Compliance and Security Frameworks.
 
 - 72% completed, 28% to go.
+
+## Day 4 (24 Dec 2025)
+
+Platform Security, minimizing base image blueprint, image scanning, repository security, observability, falco overview, using falco to detect threats and review of service mesh with Istio.
+
+- 88% completed, 12% to go.
