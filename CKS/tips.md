@@ -524,3 +524,51 @@ spec:
   mtls:
     mode: STRICT
 ```
+
+### K8S PKI - Certificate Creation
+
+Generate a CA key:
+
+```bash
+openssl genrsa -out ca.key 2048
+```
+
+Generate a CA certificate signing request:
+
+```bash
+openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+```
+
+Sign the CA certificate (self-signed by itself):
+
+```bash
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+```
+
+For other certificates, we will use the CA certificate key pair to sign the new client certificates.
+
+#### Admin User example
+
+Generate a key for the admin user:
+
+```bash
+openssl genrsa -out admin.key 2048
+```
+
+The sign request for the admin user with admin privileges (associated with the group `system:masters`):
+
+```bash
+openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+```
+
+The certificate signed by the cluster CA:
+
+```bash
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
+```
+
+#### Check certificate information
+
+```bash
+openssl x509 -in /path/to/certificate.crt -text -noout
+```

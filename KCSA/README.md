@@ -25,3 +25,13 @@ Kubernetes Security Fundamentals, Threat Model, Compliance and Security Framewor
 Platform Security, minimizing base image blueprint, image scanning, repository security, observability, falco overview, using falco to detect threats and review of service mesh with Istio.
 
 - 88% completed, 12% to go.
+
+## Day 5 (27 Dec 2025)
+
+Finishing the Platform Security topic, review of kubernetes PKI and TLS.
+
+- 100% completed.
+
+- First mock exam: 72% 😥
+  - [ ] Review of STRIDE
+  - [ ] Review of the responsibilities around Pod Security Policies and Admission Controllers
