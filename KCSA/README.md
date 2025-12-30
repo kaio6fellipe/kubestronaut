@@ -212,3 +212,81 @@ Score by Domain:
     Explanation:gVisor provides sandboxing by running in user space and intercepting system calls, which enhances security without the need for full hardware virtualization. Firecracker uses microVMs, leveraging KVM for efficient isolation. gVisor can offer better performance compared to traditional VMs due to its lightweight nature.
 
     > Domain: Cloud Native Security
+
+## Day 7 (29 Dec 2025)
+
+Review of previous questions and focused on mock exams around my weaknesses topics.
+
+- Mock exam for Cloud Native Security: 100%
+- Mock exam (overall with 60 questions): 90%
+
+Score by Domain on the overall mock exam:
+
+- Cloud Native Security: 7 / 7 (100.0%)
+- Compliance and Security Frameworks: 3 / 3 (100.0%)
+- Kubernetes Cluster Component Security: 14 / 16 (87.5%)
+- Kubernetes Security Fundamentals: 19 / 21 (90.5%)
+- Kubernetes Threat Model: 8 / 9 (88.9%)
+- Platform Security: 3 / 4 (75.0%)
+
+### Questions to review (KCSA overall mock exam)
+
+1. Which of the following actions in Kubernetes cross trust boundaries and potentially introduce security risks? (Select all that apply)
+
+    > Your answer: `Mounting hostPath volumes into pods, Using service accounts across different namespaces`
+    >
+    > Correct answer: `Mounting hostPath volumes into pods, Using service accounts across different namespaces, Pulling container images from public registries`
+
+    Explanation: Mounting hostPath volumes allows pods to access the host filesystem, crossing the boundary between container and host, which poses significant security risks. Using service accounts across namespaces can bypass namespace isolation, potentially escalating privileges. Pulling images from public registries introduces risks from untrusted or malicious images. Accessing the Kubernetes API is a controlled and authenticated action, while pod-to-pod communication within the same namespace is generally within the same trust boundary and less risky.
+
+    > Domain: Kubernetes Threat Model
+
+2. In Kubernetes, how can you apply an AppArmor profile to all containers within a Pod?
+
+    > Your answer: `Annotate each container with the AppArmor profile`
+    >
+    > Correct answer: `Annotate each container with the AppArmor profile, Use the 'appArmorProfile' field in the container spec`
+
+    Explanation: To apply an AppArmor profile to all containers in a Pod, you can use one of two methods: 1. **Annotations**: Use the annotation `container.apparmor.security.beta.kubernetes.io/<container_name>: <profile_ref>` for each container in the Pod. This method has been traditionally used and is backward-compatible. 2. **`appArmorProfile` field in `securityContext`**: Starting with Kubernetes v1.30, you can specify the AppArmor profile directly in the `securityContext` of a container using the `appArmorProfile` field. This method is more intuitive and avoids relying on annotations. Other options, such as setting it in the Deployment metadata or node-level configuration, are not valid methods for applying AppArmor profiles to specific containers.
+
+    > Domain: Platform Security
+
+3. In a Kubernetes NetworkPolicy specification, which field defines the allowed egress destinations for Pods?
+
+    > Your answer: `to`
+    >
+    > Correct answer: `egress`
+
+    Explanation: The 'egress' field in a NetworkPolicy spec specifies the rules that allow outbound traffic from selected Pods to specified destinations. The 'ingress' field defines allowed inbound traffic. 'to' is a subfield inside 'egress' rules specifying destination peers but is not the top-level field defining egress rules. 'from' is used in ingress rules to specify source peers. 'destinations' is not a valid field in NetworkPolicy.
+
+    > Domain: Kubernetes Security Fundamentals
+
+4. Select all that apply: Which Kubernetes object(s) allow you to define a set of rules for validating or mutating admission requests?
+
+    > Your answer: `ValidatingWebhookConfiguration, MutatingWebhookConfiguration, AdmissionController`
+    >
+    > Correct answer: `ValidatingWebhookConfiguration, MutatingWebhookConfiguration`
+
+    Explanation: `ValidatingWebhookConfiguration` and `MutatingWebhookConfiguration` are used to integrate admission webhooks that validate or mutate admission requests. Option 2 (`AdmissionController`) is a general term for the mechanism but not a specific Kubernetes object. Option 3 (`CustomResourceDefinition`) is used to define custom resources, and Option 4 (`WebhookPolicy`) is not a valid Kubernetes object.
+
+    > Domain: Kubernetes Security Fundamentals
+
+5. Which directories on a client machine contain sensitive information related to accessing Kubernetes clusters? (Select all that apply)
+
+    > Your answer: `~/.kube/config`
+    >
+    > Correct answer: `~/.kube/config, ~/.ssh/`
+
+    Explanation: The ~/.kube/config file stores Kubernetes cluster access credentials and configuration, making it sensitive. The ~/.ssh/ directory contains SSH keys used for secure access to nodes or clusters. Other directories like /var/log/, /etc/hosts, and /tmp/ do not typically contain sensitive Kubernetes access information.
+
+    > Domain: Kubernetes Cluster Component Security
+
+6. Which kubectl command displays the Kubernetes client and server versions for the cluster?
+
+    > Your answer: `kubectl cluster-info`
+    >
+    > Correct answer: `kubectl version`
+
+    Explanation: The command 'kubectl version' shows both the client and server (cluster) Kubernetes versions, which is useful for verifying compatibility and troubleshooting. Other commands like 'kubectl get version' or 'kubectl info' are invalid or do not provide version details. 'kubectl cluster-info' provides cluster endpoint information but not version details.
+
+    > Domain: Kubernetes Cluster Component Security
