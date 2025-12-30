@@ -8,3 +8,11 @@ With the difficulty of the CKS exam, I will study for it in conjunction with the
 - Hands-on scenarios at killercoda.com:
   - Apiserver Crash
   - Apiserver Misconfigured
+
+## Day 2 (30 Dec 2025)
+
+Started the CKS course on youtube by @brancz: [CKS - Killer Shell Course on youtube](https://www.youtube.com/watch?v=d9xfB5qaOfg).
+
+- Hands-on scenarios at killercoda.com:
+  - Container namespaces Docker
+  - Container namespaces Podman

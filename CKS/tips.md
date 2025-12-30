@@ -41,6 +41,15 @@ Additionally, almost the same tips from CKA and CKAD too:
 - Set container limits to prevent resource exhaustion on the host node.
 - Use security profiles (`spec.containers[].securityContext.seLinuxOptions` and `metadata.annotations.container\.apparmor\.security\.beta\.Kubernetes\.io/my-profile`). This would limit the actions that a container can perform.
 
+Example of running containers on docker or podman sharing the same kernel namespace:
+
+```bash
+docker run -it --name container1 -d nginx:alpine -- sleep infinity
+docker run -it --name container2 -d --pid=container:container1 nginx:alpine -- sleep infinity
+docker exec -it container1 ps aux
+docker exec -it container2 ps aux
+```
+
 ## Securing kube-proxy
 
 - `ps aux | grep kube-proxy` to check how the kube-proxy is running and identity the configurations used on the parameters (`--config` is the kube-proxy configuration file).
