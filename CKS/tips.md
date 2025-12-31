@@ -18,6 +18,37 @@ Additionally, almost the same tips from CKA and CKAD too:
 - Make sure to copy and paste the names correctly from the question, it's easy to make mistakes.
 - Manage your time effectively, don't spend too much time on a single question, you don't have to get everything right to pass the exam.
 
+## Understand Linux and container runtime (process management, namespaces, cgroups, etc)
+
+1. If you can not access a container with /bin/sh or /bin/bash, how can you check the processes running on it and how to check the files and directories of the container?
+
+1.1 When you have access to the node that the pod is running you can check that the container is running with `crictl`
+
+    ```bash
+    crictl ps -a | grep apiserver
+    ```
+
+1.2 So, since it is runnin as a container, you can check the related process on the host and grab the process id
+
+    ```bash
+    ps aux | grep apiserver
+    ```
+
+1.3 With the process id, you can check the files and directories of the container
+
+    ```bash
+    cd /proc/<pid>/
+    ```
+
+2. Example of running containers on docker or podman sharing the same kernel namespace:
+
+    ```bash
+    docker run -it --name container1 -d nginx:alpine -- sleep infinity
+    docker run -it --name container2 -d --pid=container:container1 nginx:alpine -- sleep infinity
+    docker exec -it container1 ps aux
+    docker exec -it container2 ps aux
+    ```
+
 ## Kubelet information gathering and important infos
 
 1. Check how the kubelet is running and identity the configurations used on the parameters (`--config` is the kubelet configuration file)
@@ -40,15 +71,6 @@ Additionally, almost the same tips from CKA and CKAD too:
 - Use read-only root filesystem (set `spec.securityContext.readOnlyRootFilesystem` to false).
 - Set container limits to prevent resource exhaustion on the host node.
 - Use security profiles (`spec.containers[].securityContext.seLinuxOptions` and `metadata.annotations.container\.apparmor\.security\.beta\.Kubernetes\.io/my-profile`). This would limit the actions that a container can perform.
-
-Example of running containers on docker or podman sharing the same kernel namespace:
-
-```bash
-docker run -it --name container1 -d nginx:alpine -- sleep infinity
-docker run -it --name container2 -d --pid=container:container1 nginx:alpine -- sleep infinity
-docker exec -it container1 ps aux
-docker exec -it container2 ps aux
-```
 
 ## Securing kube-proxy
 
@@ -580,4 +602,68 @@ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
 
 ```bash
 openssl x509 -in /path/to/certificate.crt -text -noout
+```
+
+### CertificateSigningRequest for users
+
+```mermaid
+
+graph TD
+    A[Create KEY] --> B[Create CSR]
+    B --> C[K8S API]
+    C --> D[Download CRT from API]
+    D --> E[Use CRT+KEY to authenticate]
+
+```
+
+Generate a certificate key with openssl for a new user:
+
+```bash
+openssl genrsa -out user.key 2048
+```
+
+Generate the CSR with openssl:
+
+```bash
+openssl req -new -key user.key -subj "/CN=user" -out user.csr
+```
+
+Create the CertificateSigningRequest with `kubectl apply -f`:
+
+```yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: user
+spec:
+  request: <base64 encoded CSR with `-w 0` flag>
+  usages:
+    - client auth
+  groups:
+    - system:authenticated
+  signerName: kubernetes.io/kube-apiserver-client
+```
+
+Admin should approve the request with `kubectl`:
+
+```bash
+kubectl certificate approve user
+```
+
+Download the certificate from the API and decode it:
+
+```bash
+kubectl get csr user -o jsonpath='{.status.certificate}' | base64 -d > user.crt
+```
+
+Use the certificate and key to authenticate with the API Server:
+
+```bash
+kubectl config set-credentials user --client-key=user.key --client-certificate=user.crt --embed-certs
+```
+
+Include the new context for the user:
+
+```bash
+kubectl config set-context user --user=user --cluster=cluster
 ```
