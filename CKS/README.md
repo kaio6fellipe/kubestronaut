@@ -32,3 +32,6 @@ Continued the CKS course on youtube.
   - RBAC ServiceAccount Permissions
   - RBAC User Permissions
   - ServiceAccount Token Mounting
+  - CertificateSigningRequest sign manually
+  - CertificateSigningRequest sign via API
+  - Apiserver NodeRestriction
