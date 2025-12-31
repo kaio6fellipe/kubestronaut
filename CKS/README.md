@@ -19,6 +19,8 @@ Started the CKS course on youtube by @brancz: [CKS - Killer Shell Course on yout
 
 ## Day 3 (31 Dec 2025)
 
+Continued the CKS course on youtube.
+
 - Hands-on scenarios at killercoda.com:
   - NetworkPolicy Create Default Deny
   - NetworkPolicy Metadata Protection
