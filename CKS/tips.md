@@ -133,6 +133,48 @@ Built-in profiles (security standard):
   ETCDCTL_API=3 etcdctl snapshot restore /path/to/backup.db --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key --data-dir=/path/to/etcd-data
   ```
 
+### Enable encryption for secrets
+
+Use the `--encryption-provider-config` flag to the kube-apiserver to enable encryption for secrets.
+
+Remember that you have to mount the encryption configuration file to the kube-apiserver pod, using a volume mount.
+
+```yaml
+...
+    volumeMounts:
+    - mountPath: /etc/kubernetes/encryption-config.yaml
+        name: encryption-config
+        readOnly: true
+...
+volumes:
+- name: encryption-config
+  hostPath:
+    path: /etc/kubernetes/encryption-config.yaml
+    type: File
+```
+
+EC configuration file example:
+
+```yaml
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+- resources:
+    - secrets
+  providers: # The order is important, the first provider will be used, the `identity` provider should only be disabled when all secrets are encrypted by the other provider. This is valid for all providers included, you should only remove it when there is no secrets associated with it.
+    - aescbc:
+        keys:
+        - name: key1
+          secret: <base64 encoded secret> # 8, 16 or 32 characters long before the base64 encoding
+    - identity: {} # fallback
+```
+
+To encrypt all secrets (if the encryption configuration were not enabled yet and the cluster already has secrets), we can just replace the current secrets:
+
+```bash
+kubectl get secrets --all-namespaces -o json | kubecctl replace -f -
+```
+
 ## Container Networking Security
 
 - Use Network Policies to restrict traffic between pods. By default kubernetes allows all traffic between pods.

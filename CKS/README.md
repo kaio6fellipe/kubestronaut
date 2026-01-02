@@ -35,3 +35,14 @@ Continued the CKS course on youtube.
   - CertificateSigningRequest sign manually
   - CertificateSigningRequest sign via API
   - Apiserver NodeRestriction
+
+## Day 4 (01 Jan 2026)
+
+Continued the CKS course on youtube.
+
+- Hands-on scenarios at killercoda.com:
+  - Secret ETCD Encryption
+  - Secret Access in Pods
+  - Secret Read and Decode
+  - Secret ServiceAccount Pod
+  - Sandbox gVisor
