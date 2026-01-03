@@ -362,3 +362,7 @@ Score by Domain:
     Explanation: The 'baseline' Pod Security Standard disallows privileged containers and blocks host networking and ports. This ensures that pods are less vulnerable to security risks by limiting their capabilities.
 
     > Domain: Kubernetes Security Fundamentals
+
+## Day 9 (03 Jan 2026)
+
+Exam day.
