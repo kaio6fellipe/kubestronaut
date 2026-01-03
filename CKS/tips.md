@@ -293,6 +293,63 @@ How to check access to a resource (if you are an administrator you can impersona
     kubectl auth can-i <action> <resource> --as <user>
     ```
 
+### Open Policy Agent (OPA)
+
+OPA is a policy engine that can be used to enforce policies on the cluster.
+
+How it works:
+
+- OPA is installed with a gatekeeper and with a webhook admission controller object.
+- We use `Template` to define the policy (which enable the creation of a new CRD) and `Constraint` to define the policy enforcement.
+
+Example of Template to define a minimum replica count:
+
+```yaml
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sminreplicacount
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sMinReplicaCount
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            min:
+              type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sminreplicacount
+
+        violation[{"msg": msg, "details": {"missing_replicas": missing}}] {
+          provided := input.review.object.spec.replicas
+          required := input.parameters.min
+          missing := required - provided
+          missing > 0 # just one condition, but you can add more, all conditions must be true to trigger the violation.
+          msg := sprintf("you must provide %v more replicas", [missing])
+        }
+```
+
+Example of a Constraint to enforce the minimum replica count to be at least 2:
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sMinReplicaCount
+metadata:
+  name: deployment-must-have-min-replicas
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+  parameters:
+    min: 2
+```
+
 ## Audit logging
 
 We can use policy object to define audit configs:
@@ -531,6 +588,99 @@ A base image is usually built `FROM scratch`, then, other apps usuarlly use thos
 Google distroless docker images contains application, runtime dependencies and does not contain package managers, shells, network tools, text editors and other unwanted programs.
 
 > For more details: [Distroless Docker Images](https://github.com/GoogleContainerTools/distroless)
+
+### Multi-stage builds
+
+Multi-stage builds are a way to create a production ready image with the necessary dependencies and tools.
+
+Example of a multi-stage build for a Go application:
+
+```dockerfile
+# Stage 0 - Build the application
+FROM ubuntu:24.04 AS builder
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y golang-go
+COPY <<EOF ./main.go
+package main
+
+import (
+    "fmt"
+    "time"
+    "os/user"
+)
+
+func main () {
+    user, err := user.Current()
+    if err != nil {
+        panic(err)
+    }
+
+    for {
+        fmt.Println("user: " + user.Username + " id: " + user.Uid)
+        time.Sleep(1 * time.Second)
+    }
+}
+EOF
+RUN CGO_ENABLED=0 go build -o /bin/hello ./main.go
+
+# Stage 1 - Create the final image just with the executable or necessary files to only run the application
+FROM scratch
+USER 10001:10001
+ENV USER=10001
+ENV GROUP=10001
+COPY --from=builder /bin/hello /bin/hello
+CMD ["/bin/hello"]
+```
+
+### Example of a dockerfile with almost all best practices implemented not using a scratch image
+
+```dockerfile
+# Stage 0 - Build the application
+# Use the exact version of the base image
+FROM ubuntu:24.04 AS builder
+ARG DEBIAN_FRONTEND=noninteractive
+# Every package that you will install, needs a specific version too, in this case the curl is used only to download the Go binary.
+RUN apt-get update && apt-get install -y curl
+# Specific version of the Go binary
+RUN curl -L https://go.dev/dl/go1.25.5.linux-amd64.tar.gz -o go1.25.5.linux-amd64.tar.gz
+RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.25.5.linux-amd64.tar.gz
+ENV PATH="/usr/local/go/bin:$PATH"
+COPY <<EOF ./main.go
+package main
+
+import (
+    "fmt"
+    "time"
+    "os/user"
+)
+
+func main () {
+    user, err := user.Current()
+    if err != nil {
+        panic(err)
+    }
+
+    for {
+        fmt.Println("user: " + user.Username + " id: " + user.Uid)
+        time.Sleep(1 * time.Second)
+    }
+}
+EOF
+RUN CGO_ENABLED=0 go build -o /bin/hello ./main.go
+
+# Stage 1 - Create the final image just with the executable or necessary files to only run the application
+FROM alpine:3.12.0
+# Create a group and user to run the application (don't use root or id=0)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup -h /home/appuser
+# Remove all write permissions from any directory that will not be used
+RUN chmod a-w /etc
+COPY --from=builder /bin/hello /home/appuser/
+# Remove all other executables from the base image
+RUN rm -rf /bin/*
+# Run the application as the user created before
+USER appuser
+CMD ["/home/appuser/hello"]
+```
 
 ### Scan images for known vulnerabilities
 

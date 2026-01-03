@@ -290,3 +290,75 @@ Score by Domain on the overall mock exam:
     Explanation: The command 'kubectl version' shows both the client and server (cluster) Kubernetes versions, which is useful for verifying compatibility and troubleshooting. Other commands like 'kubectl get version' or 'kubectl info' are invalid or do not provide version details. 'kubectl cluster-info' provides cluster endpoint information but not version details.
 
     > Domain: Kubernetes Cluster Component Security
+
+## Day 8 (02 Jan 2026)
+
+Review of previous questions and more general purpose mock exams.
+
+### Mock exam (overall with 60 questions): 97%
+
+Score by Domain on the overall mock exam:
+
+- Cloud Native Security: 7 / 7 (100.0%)
+- Compliance and Security Frameworks: 9 / 9 (100.0%)
+- Kubernetes Cluster Component Security: 12 / 13 (92.3%)
+- Kubernetes Security Fundamentals: 23 / 24 (95.8%)
+- Kubernetes Threat Model: 2 / 2 (100.0%)
+- Platform Security: 5 / 5 (100.0%)
+
+### Questions to review (KCSA overall mock exam)
+
+1. What is the default Kubernetes behavior when a container exceeds its configured memory limit?
+
+    > Your answer: The container is throttled
+    >
+    > Correct answer: The container is terminated
+
+    Explanation: When a container exceeds its memory limit, the Kubernetes kubelet kills the container to prevent it from affecting other workloads. This is known as an Out Of Memory (OOM) kill. The container is terminated and may be restarted depending on the pod's restart policy. CPU limits result in throttling, but memory limits cause termination. Kubernetes does not move pods automatically to other nodes or allocate additional memory beyond the specified limit.
+
+    > Domain: Kubernetes Cluster Component Security
+
+2. Why might a pod retain privileged access even after applying the 'restricted' Pod Security Standard (PSS) or Pod Security Admission (PSA) policy to its namespace?
+
+    > Your answer: The Pod Security Standard does not apply retroactively to existing pods, The namespace labels required for policy enforcement are misconfigured or missing, The pod specification explicitly overrides the policy
+    >
+    > Correct answer: The Pod Security Standard does not apply retroactively to existing pods, The namespace labels required for policy enforcement are misconfigured or missing
+
+    Explanation: The 'restricted' Pod Security Standard or Pod Security Admission policy applies only to pods created or updated after the policy is enforced; existing pods are not automatically remediated. Enforcement also depends on correct namespace labeling (e.g., 'pod-security.kubernetes.io/enforce=restricted'). If these labels are missing or misconfigured, the policy will not be enforced on pods in that namespace.
+
+    > Domain: Kubernetes Security Fundamentals
+
+Second mock exam (60 questions): 97%
+
+### Second mock exam (60 questions): 97%
+
+Score by Domain:
+
+- Cloud Native Security: 7 / 7 (100.0%)
+- Compliance and Security Frameworks: 5 / 5 (100.0%)
+- Kubernetes Cluster Component Security: 18 / 18 (100.0%)
+- Kubernetes Security Fundamentals: 14 / 16 (87.5%)
+- Kubernetes Threat Model: 7 / 7 (100.0%)
+- Platform Security: 7 / 7 (100.0%)
+
+### Questions to review (Second mock exam)
+
+1. Which field in the Pod spec can you use to disable privilege escalation for all containers in the Pod?
+
+    > Your answer: `spec.securityContext.allowPrivilegeEscalation: false`
+    >
+    > Correct answer: `spec.containers.securityContext.allowPrivilegeEscalation: false`
+
+    Explanation: The correct field to disable privilege escalation for all containers in a Pod is 'spec.containers.securityContext.allowPrivilegeEscalation: false'. This must be set individually for each container within the Pod, as there is no global 'allowPrivilegeEscalation' setting at the Pod level.
+
+    > Domain: Kubernetes Security Fundamentals
+
+2. Which of the following restrictions does the 'baseline' Pod Security Standard enforce? (Select all that apply)
+
+    > Your answer: `Disallows privileged containers, Requires running as non-root`
+
+    > Correct answer: `Disallows privileged containers, Blocks host networking and ports`
+
+    Explanation: The 'baseline' Pod Security Standard disallows privileged containers and blocks host networking and ports. This ensures that pods are less vulnerable to security risks by limiting their capabilities.
+
+    > Domain: Kubernetes Security Fundamentals

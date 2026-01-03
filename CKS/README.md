@@ -46,3 +46,14 @@ Continued the CKS course on youtube.
   - Secret Read and Decode
   - Secret ServiceAccount Pod
   - Sandbox gVisor
+
+## Day 5 (02 Jan 2026)
+
+Continued the CKS course on youtube.
+
+- Hands-on scenarios at killercoda.com:
+  - Privilege Escalation Containers
+  - Privileged Containers
+  - Container Hardening
+  - Container Image Footprint User
+  - Immutability Readonly Filesystem
