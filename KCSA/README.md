@@ -365,4 +365,6 @@ Score by Domain:
 
 ## Day 9 (03 Jan 2026)
 
-Exam day.
+Exam day. It was ok, a lot of questions that were trying to trick me.
+
+Let's go to the CKS.
