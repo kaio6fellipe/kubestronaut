@@ -57,3 +57,14 @@ Continued the CKS course on youtube.
   - Container Hardening
   - Container Image Footprint User
   - Immutability Readonly Filesystem
+
+## Day 6 (03 Jan 2026)
+
+Continued the CKS course on youtube.
+
+- Hands-on scenarios at killercoda.com:
+  - Static Manual Analysis Docker
+  - Static Manual Analysis K8S
+  - Image Vulnerability Scanning Trivy
+  - Image Use Digest
+  - ImagePolicyWebhook Setup

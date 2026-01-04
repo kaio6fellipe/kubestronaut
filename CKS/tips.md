@@ -350,6 +350,32 @@ spec:
     min: 2
 ```
 
+### Custom Admissions Controller Setup
+
+In this example, I will use the `ImagePolicyWebhook`, which consists of a external service that will be called by the kube-apiserver to validate the image before it provisions a pod.
+
+To configure it we need the following components in the kube-apiserver:
+
+- `ImagePolicyWebhook` admission controller enabled on the flag `--enable-admission-plugins`
+- Flag `--admissions-control-config-file` to point to the config file with the configurations for the admission controller
+- Volume mount to the config file (all files used by the webhook too, usually the entire folder like `/etc/kubernetes/admission`)
+
+Besides that, for the ImagePolicyWebhook to work, we need to configure a `kubeconf` to connect the apiserver with the external service, in this kubeconf file, clusters will be the location of the external-server, users will be the apiserver itself and context will be the merged of the previous two. For this, remember that we will also use TLS, so, a new CA and certificate for the external service and a new key/certificate for the apiserver as a client of the external service.
+
+```yaml
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+  - name: ImagePolicyWebhook
+    configuration:
+      imagePolicy:
+        kubeConfigFile: /etc/kubernetes/admission/kubeconf
+        allowTTL: 50
+        denyTTL: 50
+        retryBackoff: 500
+        defaultAllow: false
+```
+
 ## Audit logging
 
 We can use policy object to define audit configs:
