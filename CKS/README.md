@@ -68,3 +68,17 @@ Continued the CKS course on youtube.
   - Image Vulnerability Scanning Trivy
   - Image Use Digest
   - ImagePolicyWebhook Setup
+
+## Day 7 (04 Jan 2026)
+
+Finished the CKS course on youtube and started the Kodekloud CKS course.
+
+- Hands-on scenarios at killercoda.com:
+  - Syscall Activity Strace
+  - Falco Change Rule
+  - Auditing Enable Audit Logging
+  - AppArmor
+  - System Hardening Close Open Ports
+  - System Hardening Manage Packages
+
+- 10% completed, 90% to go.

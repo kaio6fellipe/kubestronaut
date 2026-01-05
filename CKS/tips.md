@@ -18,6 +18,24 @@ Additionally, almost the same tips from CKA and CKAD too:
 - Make sure to copy and paste the names correctly from the question, it's easy to make mistakes.
 - Manage your time effectively, don't spend too much time on a single question, you don't have to get everything right to pass the exam.
 
+## Resources allowed during the exam
+
+During the exam, candidates may:
+
+- Use the browser within the VM to access the following documentation:
+  - Kubernetes Documentation: https://kubernetes.io/docs/
+  - Kubernetes Blog: https://kubernetes.io/blog/
+  - Falco documentation: https://falco.org/docs/
+  - Bom documentation https://kubernetes-sigs.github.io/bom/cli-reference/ 
+  - etcd documentation https://etcd.io/docs/
+  - NGINX Ingress Controller Documentation https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/
+  - Cilium Documentation https://docs.cilium.io/en/stable
+  - Istio Documentation https://istio.io/latest/docs/
+  - Task-specific documentation provided in the Quick Reference box. This may include links to the official Kubernetes documentation or other resources that might be needed to solve a task
+- Review the Exam content instructions that are presented in the command line terminal
+- Review Documents installed by the distribution (i.e. /usr/share and its subdirectories)
+- Use packages that are part of the distribution (may also be installed by Candidate if not available by default)
+
 ## Understand Linux and container runtime (process management, namespaces, cgroups, etc)
 
 1. If you can not access a container with /bin/sh or /bin/bash, how can you check the processes running on it and how to check the files and directories of the container?
@@ -49,6 +67,22 @@ Additionally, almost the same tips from CKA and CKAD too:
     docker exec -it container2 ps aux
     ```
 
+## Behavioral Analytics at host and container level
+
+> More informations about the usage of Falco for automated behavioral analytics: [Using Falco to detect threats](#using-falco-to-detect-threats)
+
+We know that Falco is a behavioral analytics tool that can be used to detect threats at host and container level. But first, let's investigate how to analyze the behavior of a process or a container running on a host. We commonly use the following commands to do that:
+
+- `crictl ps` to check the containers running on the host
+- `ps aux | grep <binary executed by the container>` to find the related process of the container
+- `pstree -p` to find the root process of the container that we want
+- `strace -p <pid>` to track the system calls of the process and analyze the behavior of the process
+  - `strace -p <pid> -cw` to count the number of each system call
+  - `strace -p <pid> -f` to trace all processes (children) of the process
+- `cd /proc/<pid>/` would be the `filesystem` of the process, we can check the files, directories, environment variables, databases (if not encrypted) and more.
+  - `cat /proc/<pid>/environ` to check the environment variables of the process
+  - `ls -lhart /proc/<pid>/fd` to check the file descriptors of the process (opened files, sockets, etc.)
+
 ## Kubelet information gathering and important infos
 
 1. Check how the kubelet is running and identity the configurations used on the parameters (`--config` is the kubelet configuration file)
@@ -71,6 +105,152 @@ Additionally, almost the same tips from CKA and CKAD too:
 - Use read-only root filesystem (set `spec.securityContext.readOnlyRootFilesystem` to false).
 - Set container limits to prevent resource exhaustion on the host node.
 - Use security profiles (`spec.containers[].securityContext.seLinuxOptions` and `metadata.annotations.container\.apparmor\.security\.beta\.Kubernetes\.io/my-profile`). This would limit the actions that a container can perform.
+
+When we need to enable the `readOnlyRootFilesystem` but the container need to write to the filesystem, we can use the approach of using an `emptyDir` volume and mount it to the container's filesystem.
+
+### AppArmor
+
+"AppArmor is an effective and easy-to-use Linux application security system. AppArmor proactively protects the operating system and applications from external or internal threats, even zero-day attacks, by enforcing good behavior and preventing both known and unknown application flaws from being exploited."
+
+> For more details: [AppArmor](https://apparmor.net/)
+
+Check the status of AppArmor on a linux node:
+
+```bash
+aa-status
+```
+
+Generate a new AppArmor profile for a Linux application (easier than writing the profile manually):
+
+```bash
+aa-genprof curl
+```
+
+AppArmor profiles are located on the folder `/etc/apparmor.d/`.
+
+```bash
+ls -lhart /etc/apparmor.d/
+```
+
+Update the AppArmor profile based on the logs.
+
+```bash
+aa-logprof
+```
+
+How to install the AppArmor profile loaded on the folder `/etc/apparmor.d/`
+
+```bash
+apparmor_parser /etc/apparmor.d/<profile-name>
+```
+
+#### Use AppArmor with a docker container
+
+```bash
+docker run --security-opt apparmor=<profile-name> <image-name>
+```
+
+#### Use AppArmor with Kubernetes
+
+- AppArmor needs to be installed on every node
+- AppAmrmor profiles need to be available on every node
+- AppArmor profiles are specified `per container`
+
+If AppArmor is not enabled on the node, the pod will be placed on the state `Blocked`.
+
+Example of a Pod with AppArmor profile:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-apparmor
+spec:
+  containers:
+    - name: app
+      image: busybox:latest
+      securityContext: # You can also specify on the Pod level
+        appArmorProfile:
+          type: Localhost # or Unconfined or RuntimeDefault
+          localhostProfile: <profile-name>
+      command: ["sleep", "infinity"]
+```
+
+### Seccomp
+
+"Seccomp stands for secure computing mode and has been a feature of the Linux kernel since version 2.6.12. It can be used to sandbox the privileges of a process, restricting the calls it is able to make from userspace into the kernel. Kubernetes lets you automatically apply seccomp profiles loaded onto a node to your Pods and containers."
+
+> For more details: [Seccomp and Kubernetes](https://kubernetes.io/docs/reference/node/seccomp/)
+
+#### Use Seccomp with a docker container
+
+```bash
+docker run --security-opt seccomp=<seccomp-profile>.json <image-name>
+```
+
+#### Use Seccomp with Kubernetes
+
+- Seccomp needs to be configured on every kubelet, just place the seccomp json file to the same folder as the flag `--root-dir`, eg: `/var/lib/kubelet/seccomp/profiles/`.
+
+If the seccomp profile is not found, the pod will be place on the state of `CreateContainerError`.
+
+Example of a Pod with Seccomp profile:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-with-seccomp
+spec:
+  securityContext: # You can also specify on the Container level
+    seccompProfile:
+      type: Localhost # or Unconfined or RuntimeDefault
+      localhostProfile: profiles/<profile-name>.json
+  containers:
+    - name: app
+      image: busybox:latest
+```
+
+## Securing kubernetes nodes
+
+Overview around security layers for Linux nodes:
+
+- Applications
+  - Keep up to date
+  - Update Linux Kernel
+  - Remove not needed packages
+- Network
+  - Network behind firewall
+  - Check and close open ports
+- IAM
+  - Run as user, not root
+  - Restrict user permissions
+
+Nodes of Kubernetes considerations:
+
+- **Only purpose**: run Kubernetes components, remove unnecessary services
+- **Node Recycling**: Nodes should be ephemeral, created from images, can be recycled any time (and fast if necessary)
+
+### Identity open ports
+
+```bash
+netstat -tulnp | grep <port-number>
+# or
+lsof -i :<port-number>
+```
+
+### Managing services and identifying processes
+
+```bash
+systemctl list-units --type=service --state=running | grep <service-name>
+systemctl status <service-name>
+# disable a service (and stop it)
+systemctl stop <service-name> && systemctl disable <service-name>
+```
+
+```bash
+ps aux | grep <service-name>
+```
 
 ## Securing kube-proxy
 
@@ -384,7 +564,7 @@ We can use policy object to define audit configs:
 apiVersion: audit.k8s.io/v1
 kind: Policy
 omitStages: ["RequestReceived"] # RequestReceived, ResponseStarted, ResponseComplete, Panic
-rules:
+rules: # The first matching rule will be used, so, use the specific rules first and then the generic ones.
 - namespaces: ["prod-namespace"]
   verbs: ["delete"]
   resources:
@@ -596,6 +776,13 @@ Cloud Native Security Map discuss the security of phases of the software develop
   - Storage: ROOK, ceph, gluster
   - Access: keycloak, teleport, hashicorp vault
 
+#### kube-bench
+
+```bash
+kube-bench run --targets=master
+kube-bench --check="1.3.1" # check specific benchmark
+```
+
 ## Platform Security
 
 ### Minimize base image blueprint
@@ -728,7 +915,9 @@ Observability tools for abnormal behavior are crucial to detect and respond to t
 
 The easiest way to use falco is to install it as a daemonset on the cluster. But it can be installed as a package on each node.
 
-Falco implement several rules to detect abnormal behavior, rules are written in a `rules.yaml` file with the following structure:
+Falco implement several rules to detect abnormal behavior, rules are written in a `rules.yaml` file (usually on the folder `/etc/falco/*`) with the following structure:
+
+When you need to change something on a rule (not valid when changing the rule name), just include the rule on the `falco_rules.local.yaml` file, this will override the rule on the `falco_rules.yaml` file.
 
 ```yaml
 - rule: <Name of the Rule>
