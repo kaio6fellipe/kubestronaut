@@ -420,6 +420,32 @@ You can not create users with kubectl, you will rely on the following mechanisms
 - certificates
 - identity services
 
+### ServiceAccount Token Mounting
+
+ServiceAccount token secrets are not created by default on the API server. When you need this token for specific needs, you can create it manually, and then associate it to a ServiceAccount.
+
+```bash
+k create sa <service-account-name>
+```
+
+Create the token secret:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <secret-name>
+  annotations:
+    kubernetes.io/service-account.name: <service-account-name>
+type: kubernetes.io/service-account-token
+```
+
+Associate the secret to the ServiceAccount:
+
+```bash
+kubectl patch sa <service-account-name> -p '{"secrets": [{"name": "<secret-name>"}]}'
+```
+
 ## Authorization on a cluster
 
 Authorization is the process of determining if a user has access to a resource.

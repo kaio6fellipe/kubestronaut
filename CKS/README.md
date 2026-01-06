@@ -82,3 +82,9 @@ Finished the CKS course on youtube and started the Kodekloud CKS course.
   - System Hardening Manage Packages
 
 - 10% completed, 90% to go.
+
+## Day 8 (05 Jan 2026)
+
+Continued the CKS course at Kodekloud.
+
+- 20% completed, 80% to go.
