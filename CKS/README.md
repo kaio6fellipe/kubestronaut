@@ -88,3 +88,9 @@ Finished the CKS course on youtube and started the Kodekloud CKS course.
 Continued the CKS course at Kodekloud.
 
 - 20% completed, 80% to go.
+
+## Day 9 (06 Jan 2026)
+
+Continued the CKS course at Kodekloud. Finished the review of Cluster Setup and Hardening and System Hardening (Linux) topics
+
+- 54% completed, 46% to go.

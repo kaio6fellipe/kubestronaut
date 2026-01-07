@@ -231,7 +231,7 @@ Nodes of Kubernetes considerations:
 - **Only purpose**: run Kubernetes components, remove unnecessary services
 - **Node Recycling**: Nodes should be ephemeral, created from images, can be recycled any time (and fast if necessary)
 
-### Identity open ports
+### Identify open ports
 
 ```bash
 netstat -tulnp | grep <port-number>
@@ -250,6 +250,66 @@ systemctl stop <service-name> && systemctl disable <service-name>
 
 ```bash
 ps aux | grep <service-name>
+```
+
+### Managing users and groups
+
+- Disable login for a user
+  ```bash
+  usermod -s /bin/nologin <username>
+  ```
+
+- Delete a user
+  ```bash
+  userdel -r <username>
+  ```
+
+- Remove user from group
+  ```bash
+  deluser <username> <groupname>
+  ```
+
+- Set user password
+  ```bash
+  passwd <username>
+  ```
+
+### Hardening SSH and SSH service
+
+- Use public key authentication instead of password authentication.
+- HardeningSSH Service configuration (just the basics, use the [CIS Benchmark](https://www.cisecurity.org/cis-benchmarks) for more details):
+
+  ```bash
+  vi /etc/ssh/sshd_config
+  # Set the following parameters:
+  PermitRootLogin no
+  PasswordAuthentication no
+  # Restart the SSH service
+  systemctl restart sshd
+  ```
+
+### Hardening Network Firewall (usually with ufw)
+
+Install ufs:
+
+```bash
+apt-get update
+apt-get install ufw
+systemctl enable ufw
+systemctl start ufw
+```
+
+Commands;
+
+```bash
+ufw status
+ufw default allow outgoing
+ufw default deny incoming
+ufw allow from <ip> to any port 22 proto tcp
+ufw allow from <ip-cidr> to any port 80 proto tcp
+ufw deny 8080
+ufw enable
+ufw delete deny 8080
 ```
 
 ## Securing kube-proxy
