@@ -94,3 +94,9 @@ Continued the CKS course at Kodekloud.
 Continued the CKS course at Kodekloud. Finished the review of Cluster Setup and Hardening and System Hardening (Linux) topics
 
 - 54% completed, 46% to go.
+
+## Day 10 (07 Jan 2026)
+
+Continued the CKS course at Kodekloud. Review of Minimize Microservices Vulnerabilities topics.
+
+- 72% completed, 28% to go.

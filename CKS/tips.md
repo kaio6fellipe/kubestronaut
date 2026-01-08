@@ -211,6 +211,37 @@ spec:
       image: busybox:latest
 ```
 
+### gVisor
+
+gVisor is a user-space kernel that provides a sandboxing mechanism for containers. It is a lightweight kernel that runs in user space and intercepts system calls to provide a sandboxed environment for containers.
+
+To use it on Kubernetes, we need to create a `RuntimeClass` object and the gVisor container runtime (runsc) should be available on each node of the cluster.
+
+Example of a RuntimeClass object:
+
+```yaml
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor
+handler: runsc
+```
+
+How to use the RuntimeClass object on a Pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gvisor-test
+spec:
+  runtimeClassName: gvisor
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["dmesg"]  # ← Directly execute dmesg for instant validation
+```
+
 ## Securing kubernetes nodes
 
 Overview around security layers for Linux nodes:
@@ -615,6 +646,10 @@ spec:
   parameters:
     min: 2
 ```
+
+#### OPA non gatekeeper setup
+
+When using OPA without the gatekeeper setup, we can use the `ValidatingWebhookConfigurations` resource with just a webhook to an OPA server, and use configmaps on the OPA server namespace to store the policies. Here you can check more details about the differences between the two setups: [How is Gatekeeper different from OPA?](https://open-policy-agent.github.io/gatekeeper/website/docs/#how-is-gatekeeper-different-from-opa)
 
 ### Custom Admissions Controller Setup
 
