@@ -108,6 +108,39 @@ We know that Falco is a behavioral analytics tool that can be used to detect thr
 
 When we need to enable the `readOnlyRootFilesystem` but the container need to write to the filesystem, we can use the approach of using an `emptyDir` volume and mount it to the container's filesystem.
 
+### Ensure Immutability of Containers at Runtime
+
+Example of a Pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: nginx
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      privileged: false
+    volumeMounts:
+    - name: cache-volume
+      mountPath: /var/cache/nginx
+    - name: runtime-volume
+      mountPath: /var/run
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+  - name: runtime-volume
+    emptyDir: {}
+```
+
+Use PodSecurityPolicy or PodSecurityStandards to ensure immutability of containers at runtime.
+
 ### AppArmor
 
 "AppArmor is an effective and easy-to-use Linux application security system. AppArmor proactively protects the operating system and applications from external or internal threats, even zero-day attacks, by enforcing good behavior and preventing both known and unknown application flaws from being exploited."
@@ -443,7 +476,7 @@ resources:
 To encrypt all secrets (if the encryption configuration were not enabled yet and the cluster already has secrets), we can just replace the current secrets:
 
 ```bash
-kubectl get secrets --all-namespaces -o json | kubecctl replace -f -
+kubectl get secrets --all-namespaces -o json | kubectl replace -f -
 ```
 
 ## Container Networking Security
@@ -658,7 +691,7 @@ In this example, I will use the `ImagePolicyWebhook`, which consists of a extern
 To configure it we need the following components in the kube-apiserver:
 
 - `ImagePolicyWebhook` admission controller enabled on the flag `--enable-admission-plugins`
-- Flag `--admissions-control-config-file` to point to the config file with the configurations for the admission controller
+- Flag `--admission-control-config-file` to point to the config file with the configurations for the admission controller
 - Volume mount to the config file (all files used by the webhook too, usually the entire folder like `/etc/kubernetes/admission`)
 
 Besides that, for the ImagePolicyWebhook to work, we need to configure a `kubeconf` to connect the apiserver with the external service, in this kubeconf file, clusters will be the location of the external-server, users will be the apiserver itself and context will be the merged of the previous two. For this, remember that we will also use TLS, so, a new CA and certificate for the external service and a new key/certificate for the apiserver as a client of the external service.
@@ -869,8 +902,20 @@ How everything work together:
 
 - Binaries and container images are signed using Cosign
 - The SBOM details all the components and their origins, helping you identity risks
-- The SBOM and othe rmetadata are signed to ensure trustworthiness
+- The SBOM and other metadata are signed to ensure trustworthiness
 - Finally Admission controllers verify these signatures and enforce compliance before deployment
+
+#### SBOM - Generation Process
+
+Generate a SBOM:
+```bash
+syft scan <image-name or filesystem-path> -o cyclonedx-json > sbom.json
+```
+
+Scan the SBOM and generate a report:
+```bash
+grype sbom:sbom.json -o json --file=report.json
+```
 
 ### Automation and Tooling
 
@@ -902,6 +947,25 @@ Cloud Native Security Map discuss the security of phases of the software develop
 ```bash
 kube-bench run --targets=master
 kube-bench --check="1.3.1" # check specific benchmark
+```
+
+#### kube-linter
+
+```bash
+kube-linter lint <path-to-manifest> --config="<path-to-config-file>"
+```
+
+#### kubesec
+
+```bash
+kubesec scan <path-to-manifest>.yaml
+```
+
+#### trivy
+
+```bash
+trivy <image-name> --severity CRITICAL-HIGH
+docker save nginx:1.18.0 > nginx.tar && trivy image --input nginx.tar
 ```
 
 ## Platform Security
@@ -1036,6 +1100,40 @@ Observability tools for abnormal behavior are crucial to detect and respond to t
 
 The easiest way to use falco is to install it as a daemonset on the cluster. But it can be installed as a package on each node.
 
+Falco important configs (besides rules):
+
+```yaml
+.
+.
+.
+rules_file:
+  - /etc/falco/falco_rules.yaml # Default
+  - /etc/falco/falco_rules.local.yaml
+  - /etc/falco/k8s_audit_rules.yaml
+  - /etc/falco/rules.d
+
+json_output: false
+log_stderr: true
+log_syslog: true
+log_level: info
+priority: debug
+
+stdout_output:
+  enabled: true
+
+file_output:
+  enabled: true
+  filename: /opt/falco/events.txt
+
+program_output:
+  enabled: true
+  program: "jq '{text: .output}' | curl -d @- -X POST https://hooks.slack.com/services/XXX"
+
+http_output:
+  enabled: true
+  url: http://some.url/some/path
+```
+
 Falco implement several rules to detect abnormal behavior, rules are written in a `rules.yaml` file (usually on the folder `/etc/falco/*`) with the following structure:
 
 When you need to change something on a rule (not valid when changing the rule name), just include the rule on the `falco_rules.local.yaml` file, this will override the rule on the `falco_rules.yaml` file.
@@ -1082,6 +1180,31 @@ metadata:
 spec:
   mtls:
     mode: STRICT
+```
+
+#### Cilium
+
+Cilium uses eBPF to provide network, security, observability and more features.
+
+To use Cilium to encrypt traffic, we need to enable the wireguard encryption on the nodes with the flag `encryption.type=wireguard`.
+
+The CiliumNetworkPolicy is an important resource too, it will be asked to use it in the exam. If you already know how to use conventional NetworkPolicies, you should be able to use CiliumNetworkPolicies too.
+
+Example of a CiliumNetworkPolicy:
+```yaml
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-ingress-from-namespace
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      app: my-app
+  ingress:
+    - fromEndpoints:
+      - matchLabels:
+        app: my-app
 ```
 
 ### K8S PKI - Certificate Creation
