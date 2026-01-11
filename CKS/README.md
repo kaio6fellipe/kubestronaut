@@ -143,3 +143,15 @@ Continued the CKS course at Kodekloud. Finished the review of Monitoring, Loggin
 - [x] Audit logs on kubernetes, if I didn't missed time on the falco question, I would have enought time to answer this question.
 
 After the review, if I didn't missed the basic details (still disconsidering the falco question), I would have a score around 92%.
+
+## Day 13 (10 Jan 2026)
+
+- Mock exam 3: Second lab of Kodekloud, still some bugs on the evaluation of the score, but I was able to answer all questions, I think I would have a score around 80%.
+- Mock exam 4: Killer.sh retry for the CKS Simulator A. Score of 67/73 = 91,78%.
+
+### To review
+
+- [x] Just an observation around audit policy, I need to pay attention on the details like: `Changes to deployments in the default namespace at the Request level`, this means that only verbs that changes the deployment should be audited, like: `create, update, patch, delete`.
+- [x] Copy and paste every change that they ask (missed some points 'cause I included the image `alpine: 3.2` instead of `alpine: 3.12`)
+- [x] Pay attention to what they ask around network policies, missed some points 'cause I included an `egress` instead of an `egressDeny`.
+- [x] Pay attention to CiliumNetworkPolicy specs, do not repeat the fields `egress`, `egressDeny`, `ingress`, `ingressDeny`, etc. Again, to allow traffic in the same namespace just use `toEndpoints: [{}]`
