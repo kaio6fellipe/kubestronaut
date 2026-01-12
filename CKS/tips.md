@@ -108,6 +108,44 @@ We know that Falco is a behavioral analytics tool that can be used to detect thr
 
 When we need to enable the `readOnlyRootFilesystem` but the container need to write to the filesystem, we can use the approach of using an `emptyDir` volume and mount it to the container's filesystem.
 
+### Changing docker daemon configuration examples
+
+Change the ownership of the docker file:
+
+```bash
+sudo chown root:root /var/run/docker.sock
+```
+
+Then add `--group=root` to the ExecStart of docker systemd file:
+
+```bash
+sudo systemctl edit docker
+```
+
+```bash
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd --group=root
+```
+
+Then reload the docker daemon:
+
+```bash
+sudo systemctl daemon-reexec 
+sudo systemctl daemon-reload 
+sudo systemctl restart docker
+```
+
+To remove the TCP external connections, modify the /etc/docker/daemon.json to remove the tcp section so that the file looks like this:
+
+```json
+{
+  "hosts": ["unix:///var/run/docker.sock"]
+}
+```
+
+Then restart docker again.
+
 ### Ensure Immutability of Containers at Runtime
 
 Example of a Pod:

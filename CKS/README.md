@@ -155,3 +155,7 @@ After the review, if I didn't missed the basic details (still disconsidering the
 - [x] Copy and paste every change that they ask (missed some points 'cause I included the image `alpine: 3.2` instead of `alpine: 3.12`)
 - [x] Pay attention to what they ask around network policies, missed some points 'cause I included an `egress` instead of an `egressDeny`.
 - [x] Pay attention to CiliumNetworkPolicy specs, do not repeat the fields `egress`, `egressDeny`, `ingress`, `ingressDeny`, etc. Again, to allow traffic in the same namespace just use `toEndpoints: [{}]`
+
+## Day 14 (11 Jan 2026)
+
+- Mock exam 5: Kodekloud third lab, score of 91%. kubesec questions are impossible to answer on the mock exam, always got the output `This resource is invalid, unknown schema`, when I run the same command over the same manifest in my local machine, it works fine.
