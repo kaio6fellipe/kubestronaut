@@ -42,30 +42,30 @@ During the exam, candidates may:
 
 1.1 When you have access to the node that the pod is running you can check that the container is running with `crictl`
 
-    ```bash
-    crictl ps -a | grep apiserver
-    ```
+```bash
+crictl ps -a | grep apiserver
+```
 
 1.2 So, since it is runnin as a container, you can check the related process on the host and grab the process id
 
-    ```bash
-    ps aux | grep apiserver
-    ```
+```bash
+ps aux | grep apiserver
+```
 
 1.3 With the process id, you can check the files and directories of the container
 
-    ```bash
-    cd /proc/<pid>/
-    ```
+```bash
+cd /proc/<pid>/
+```
 
 2. Example of running containers on docker or podman sharing the same kernel namespace:
 
-    ```bash
-    docker run -it --name container1 -d nginx:alpine -- sleep infinity
-    docker run -it --name container2 -d --pid=container:container1 nginx:alpine -- sleep infinity
-    docker exec -it container1 ps aux
-    docker exec -it container2 ps aux
-    ```
+```bash
+docker run -it --name container1 -d nginx:alpine -- sleep infinity
+docker run -it --name container2 -d --pid=container:container1 nginx:alpine -- sleep infinity
+docker exec -it container1 ps aux
+docker exec -it container2 ps aux
+```
 
 ## Behavioral Analytics at host and container level
 
@@ -87,9 +87,9 @@ We know that Falco is a behavioral analytics tool that can be used to detect thr
 
 1. Check how the kubelet is running and identity the configurations used on the parameters (`--config` is the kubelet configuration file)
 
-    ```bash
-    ps aux | grep kubelet
-    ```
+```bash
+ps aux | grep kubelet
+```
 
 2. Kubelet configs, ports, authentication and authorization:
 
@@ -98,6 +98,12 @@ We know that Falco is a behavioral analytics tool that can be used to detect thr
    - `authentication`: enable `anonymous` access or not, `x509` (client certificates), `webhook` (bearer token)
    - `authorization`: mode on how the user will be authorized on API calls, `Webhook` means that the authorization will be delegated to the api server, `AlwaysAllow` is always allow all requests (default).
    - `readOnlyPort`: port for the read only API, default is `10255`, set to `0` to disable it.
+
+3. Kubelet configurations on kube-system configmap (this configuration will be applied to new nodes):
+
+```bash
+kubectl get configmap kubelet-config -n kube-system -o yaml
+```
 
 ## Securing Container Runtime
 
@@ -357,38 +363,38 @@ ps aux | grep <service-name>
 ### Managing users and groups
 
 - Disable login for a user
-  ```bash
-  usermod -s /bin/nologin <username>
-  ```
+```bash
+usermod -s /bin/nologin <username>
+```
 
 - Delete a user
-  ```bash
-  userdel -r <username>
-  ```
+```bash
+userdel -r <username>
+```
 
 - Remove user from group
-  ```bash
-  deluser <username> <groupname>
-  ```
+```bash
+deluser <username> <groupname>
+```
 
 - Set user password
-  ```bash
-  passwd <username>
-  ```
+```bash
+passwd <username>
+```
 
 ### Hardening SSH and SSH service
 
 - Use public key authentication instead of password authentication.
 - HardeningSSH Service configuration (just the basics, use the [CIS Benchmark](https://www.cisecurity.org/cis-benchmarks) for more details):
 
-  ```bash
-  vi /etc/ssh/sshd_config
-  # Set the following parameters:
-  PermitRootLogin no
-  PasswordAuthentication no
-  # Restart the SSH service
-  systemctl restart sshd
-  ```
+```bash
+vi /etc/ssh/sshd_config
+# Set the following parameters:
+PermitRootLogin no
+PasswordAuthentication no
+# Restart the SSH service
+systemctl restart sshd
+```
 
 ### Hardening Network Firewall (usually with ufw)
 
@@ -467,13 +473,19 @@ Built-in profiles (security standard):
 - Add the `--encryption-provider-config` flag to the etcd server to enable encryption at rest and point to the encryption config file.
 - Secure data in transit with TLS. The flag `--client-cert-auth` enable client certificate authentication.
 - Etcd backups is important
-  ```bash
-  ETCDCTL_API=3 etcdctl snapshot save /path/to/backup.db --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key
-  ```
+```bash
+ETCDCTL_API=3 etcdctl snapshot save /path/to/backup.db --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key
+```
 - Restore etcd backups
-  ```bash
-  ETCDCTL_API=3 etcdctl snapshot restore /path/to/backup.db --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key --data-dir=/path/to/etcd-data
-  ```
+```bash
+ETCDCTL_API=3 etcdctl snapshot restore /path/to/backup.db --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key --data-dir=/path/to/etcd-data
+```
+
+### Using etcdctl to get information from etcd
+
+```bash
+ETCDCTL_API=3 etcdctl get /registry/{type}/{namespace}/{name} --endpoints=<etcd-endpoints> --cacert=/path/to/ca.crt --cert=/path/to/etcd-client.crt --key=/path/to/etcd-client.key
+```
 
 ### Enable encryption for secrets
 
@@ -536,29 +548,29 @@ kubectl get secrets --all-namespaces -o json | kubectl replace -f -
 ### Using `kube proxy` command
 
 - Send requests to the API server with all configurations sets
-    ```bash
-    kubectl proxy
-    ```
+```bash
+kubectl proxy
+```
 
-    ```bash
-    curl -k http://localhost:8001
-    ```
+```bash
+curl -k http://localhost:8001
+```
 
 - Send requests to any service in the cluster (not exposed through NodePort or LoadBalancer)
 
-    ```bash
-    curl -k http://localhost:8001/api/v1/namespaces/<namespace>/services/<service-name>/proxy/
-    ```
+```bash
+curl -k http://localhost:8001/api/v1/namespaces/<namespace>/services/<service-name>/proxy/
+```
 
 - Configuring a port forward
 
-    ```bash
-    kubectl port-forward service/nginx <local-port>:<service-port>
-    ```
+```bash
+kubectl port-forward service/nginx <local-port>:<service-port>
+```
 
-    ```bash
-    curl http://localhost:<local-port>
-    ```
+```bash
+curl http://localhost:<local-port>
+```
 
 ### kubeconfig
 
@@ -651,15 +663,15 @@ How to check access to a resource (if you are an administrator you can impersona
 
 - Check if the current user can perform an action
 
-    ```bash
-    kubectl auth can-i <action> <resource>
-    ```
+```bash
+kubectl auth can-i <action> <resource>
+```
 
 - Check if a specific user or service account can perform an action (impersonation):
 
-    ```bash
-    kubectl auth can-i <action> <resource> --as <user>
-    ```
+```bash
+kubectl auth can-i <action> <resource> --as <user>
+```
 
 ### Open Policy Agent (OPA)
 
@@ -999,6 +1011,12 @@ kube-linter lint <path-to-manifest> --config="<path-to-config-file>"
 kubesec scan <path-to-manifest>.yaml
 ```
 
+Using docker to scan a manifest:
+
+```bash
+docker run -i kubesec/kubesec:v2 scan /dev/stdin < manifest.yaml
+```
+
 #### trivy
 
 ```bash
@@ -1198,6 +1216,51 @@ When you need to change something on a rule (not valid when changing the rule na
 
 > For more details about [supported fields](https://falco.org/docs/reference/rules/supported-fields/)
 
+Falco can also be asked to analyze the behavior without being a systemd unit, in this case, we need to use the `falco` binary directly:
+
+```bash
+falco -U | grep <information-to-search>
+falco --list | grep <information-to-search> # List available fields to use on conditions
+```
+
+### Network Policies
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-private-access
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      id: api-private                      # this policy controls these Pods
+  ingress:
+  - from:                                  ### ingress rule 1
+    - namespaceSelector: {}                # from any Namespace
+      podSelector:
+        matchLabels:
+          api-access-cache: "true"         # from Pods with certain labels
+    ports:
+    - port: 2000                           # to port 2000
+      protocol: TCP
+  - from:                                  ### ingress rule 2
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          api-access-operation: "true"
+    ports:
+    - port: 3000
+      protocol: TCP
+  - from:                                  ### ingress rule 3
+    - ipBlock: # allow traffic from a specific IP range
+        cidr: 172.17.0.0/16
+        except: # exclude specific IP range from the cidr described before
+        - 172.17.1.0/24
+  policyTypes:
+  - Ingress                                # only ingress is controlled
+```
+
 ### Service Mesh
 
 Istiod merged components (control plane):
@@ -1242,7 +1305,106 @@ spec:
   ingress:
     - fromEndpoints:
       - matchLabels:
-        app: my-app
+          app: my-app
+      authentication:
+        mode: "required"   # Enable Mutual Authentication
+```
+
+##### Examples of CiliumNetworkPolicies
+
+- default-allow which assures that all Namespace-internal traffic is allowed
+
+```yaml
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-allow
+  namespace: team-iris
+spec:
+  endpointSelector:
+    matchLabels: {}             # Apply this policy to all Pods in Namespace team-iris 
+  egress:
+  - toEndpoints:
+    - {}                        # ALLOW egress to all Pods in Namespace team-iris
+  - toEndpoints:              
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+    toPorts:
+      - ports:
+          - port: "53"
+            protocol: UDP
+        rules:
+          dns:
+            - matchPattern: "*"
+  ingress:
+  - fromEndpoints:              # ALLOW ingress from all Pods in Namespace team-iris
+    - {}
+```
+
+- Layer 3 policy named p1 to:
+  - Deny outgoing traffic from Pods with label type=messenger to Pods behind Service database
+
+```yaml
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: p1
+  namespace: team-iris
+spec:
+  endpointSelector:
+    matchLabels:
+      type: messenger
+  egressDeny:
+  - toEndpoints:
+    - matchLabels:
+        type: database  # we use the label of the Pods behind the Service "database"
+```
+
+- Layer 4 policy named p2 to:
+  - Deny outgoing ICMP traffic from Deployment transmitter to Pods behind Service database
+
+```yaml
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: p2
+  namespace: team-iris
+spec:
+  endpointSelector:
+    matchLabels:
+      type: transmitter # we use the label of the Pods behind Deployment "transmitter"
+  egressDeny:
+  - toEndpoints:
+    - matchLabels:
+        type: database  # we use the label of the Pods behind the Service "database"
+    icmps:
+    - fields:
+      - type: 8
+        family: IPv4
+      - type: EchoRequest
+        family: IPv6
+```
+
+- Layer 3 policy named p3 to:
+  - Enable Mutual Authentication for outgoing traffic from Pods with label type=database to Pods with label type=messenger
+
+```yaml
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: p3
+  namespace: team-iris
+spec:
+  endpointSelector:
+    matchLabels:
+      type: database
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        type: messenger
+    authentication:
+      mode: "required"     # Enable Mutual Authentication
 ```
 
 ### K8S PKI - Certificate Creation
@@ -1291,6 +1453,12 @@ openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
 
 ```bash
 openssl x509 -in /path/to/certificate.crt -text -noout
+```
+
+#### Check CSR information
+
+```bash
+openssl req -in <path-to-csr> -noout -text
 ```
 
 ### CertificateSigningRequest for users

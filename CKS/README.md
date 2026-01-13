@@ -159,3 +159,20 @@ After the review, if I didn't missed the basic details (still disconsidering the
 ## Day 14 (11 Jan 2026)
 
 - Mock exam 5: Kodekloud third lab, score of 91%. kubesec questions are impossible to answer on the mock exam, always got the output `This resource is invalid, unknown schema`, when I run the same command over the same manifest in my local machine, it works fine.
+
+## Day 15 (12 Jan 2026)
+
+- Lab sessions at Kodekloud: Kodekloud dedicated scenarios to practice specific cases.
+
+## Day 16 (13 Jan 2026)
+
+- Mock exam 6: Killer.sh CKS Simulator B. Score of 48/71, 67.6% 😬
+- Mock exam 6: Killer.sh CKS Simulator B retry. Score of 68/71, 95,77%
+
+### To review
+
+- [x] Kubelet config (how to apply the configurations and where they are located): usually on each node (`ps aux | grep kubelet` to discover) and there is a main configmap at kube-system namespace.
+- [x] ETCD, how to use etcdctl to get information from informations inside etcd (secrets, configmaps, etc).
+- [x] NetworkPolicies and CiliumNetworkPolicies, didn't have enough time to answer the CiliumNetworkPolicy question.
+- [x] Falco command to speedup the analysis of the behavior asked on the question.
+- [x] How to perform requests to the kubernetes API from pods with curl and service account token (eg. `curl https://kubernetes.default/api/v1/namespaces/restricted/secrets -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" -k`)
