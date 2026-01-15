@@ -176,3 +176,12 @@ After the review, if I didn't missed the basic details (still disconsidering the
 - [x] NetworkPolicies and CiliumNetworkPolicies, didn't have enough time to answer the CiliumNetworkPolicy question.
 - [x] Falco command to speedup the analysis of the behavior asked on the question.
 - [x] How to perform requests to the kubernetes API from pods with curl and service account token (eg. `curl https://kubernetes.default/api/v1/namespaces/restricted/secrets -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" -k`)
+
+## Day 17 (14 Jan 2026)
+
+- Mock exam 7: Kodekloud ultimate mock exam series: 92%
+  - OMG, Kodekloud mock exams for CKS have so many bugs, even including everything write, a specific validation on the question don't pass.
+- Mock exam 8: Kodekloud ultimate mock exam series: after the review, I would have a score around 90%
+  - Again, Kodekloud mock exams for CKS are a ***** ** **** (not so good for me). Missed one question, but all questions couldn't recognize a pod running, always the last step where wrong, even if everything was right.
+
+- Exam day, just waiting for the results
