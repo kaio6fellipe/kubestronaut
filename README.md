@@ -6,4 +6,4 @@ Kubestronaut notes and journey
 * [x] CKAD (Score: 100%)
 * [x] KCNA (Score: 97%)
 * [x] KCSA (Score: 93%)
-* [ ] CKS
+* [x] CKS (Score: 94%)

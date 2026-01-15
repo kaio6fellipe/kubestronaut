@@ -185,3 +185,7 @@ After the review, if I didn't missed the basic details (still disconsidering the
   - Again, Kodekloud mock exams for CKS are a ***** ** **** (not so good for me). Missed one question, but all questions couldn't recognize a pod running, always the last step where wrong, even if everything was right.
 
 - Exam day, just waiting for the results
+
+## Day 18 (15 Jan 2026)
+
+- Passed the CKS exam, score of 94%.
